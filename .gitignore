@@ -1,0 +1,12 @@
+app/data/*
+!app/data/.gitkeep
+
+.idea
+*.iml
+
+secrets/*
+!secrets/.gitkeep
+
+.php_cs.cache
+
+target/*
