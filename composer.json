@@ -1,0 +1,45 @@
+{
+    "name": "motorphp/silextools",
+    "description": "development tools for the silex framework",
+    "type": "library",
+    "license": "BSD-3",
+    "authors": [
+        {
+            "name": "Radu Helstern",
+            "email": "radu.helstern@gmail.com"
+        }
+    ],
+    "require": {
+        "nette/php-generator": "^3.1",
+        "phramz/doctrine-annotation-scanner": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Motorphp\\SilexTools\\": "src/main/php"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Motorphp\\SilexTools\\": [
+                "src/main/php",
+                "src/test/php"
+
+            ],
+            "Resource\\": [
+                "src/test/resources"
+            ]
+        }
+    },
+    "repositories": {
+        "motorphp/silexannotations": {
+            "type": "path",
+            "url": "../silexannotations"
+        }
+    },
+    "require-dev": {
+        "silex/silex": "^2.2",
+        "phpunit/phpunit": "^7.1",
+        "zircote/swagger-php": "^2.0",
+        "motorphp/silexannotations": "dev-develop"
+    }
+}
