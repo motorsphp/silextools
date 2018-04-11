@@ -65,7 +65,7 @@ class MatchResults implements Matches
         return $this->mapEntries($matchKey, $mapper);
     }
 
-    private function mapEntries(string $matchKey, \Closure $mapper) : ?array
+    private function mapEntries(string $matchKey, \Closure $mapper) : array
     {
         $mapped = [];
         foreach ($this->matchEntries as $matchEntry) {
@@ -77,7 +77,7 @@ class MatchResults implements Matches
             }
         }
 
-        return empty($mapped) ? null : $mapped;
+        return empty($mapped) ? [] : $mapped;
     }
 
     private function getArrayOrNull(string $matchKey, array &$entries) : ?array

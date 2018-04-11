@@ -46,6 +46,11 @@ class PatternBuilder
             $builder->class($class);
         }
 
+        $constants = $pattern->getConstants();
+        foreach ($constants as $constant) {
+            $builder->constant($constant);
+        }
+
         return $builder;
     }
 

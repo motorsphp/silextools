@@ -18,6 +18,7 @@ class HealthCheckFactories
 
     /**
      * @ServiceFactory
+     *
      * @param Container $app
      * @return HealthCheckFactories
      */

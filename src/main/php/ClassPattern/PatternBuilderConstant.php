@@ -71,7 +71,6 @@ class PatternBuilderConstant
         $bitmask = array_reduce($params, function (int $carry, int $param) {
             return $carry | $param;
         }, 0);
-
         $this->visibility = $bitmask;
 
         return $this;
@@ -86,7 +85,6 @@ class PatternBuilderConstant
     {
         $builder = PatternBuilder::copy($this->expression, $this->reader);
         $id = PatternId::next($this->matchKey);
-
         $constant = new PatternConstant($id, $this->annotations, $this->visibility);
         return $builder->constant($constant);
     }

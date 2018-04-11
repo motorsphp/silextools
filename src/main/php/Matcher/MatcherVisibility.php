@@ -35,7 +35,7 @@ class MatcherVisibility implements  MatcherConstant, MatcherMethod
         if (Constants::VISIBILITY_PROTECTED & $this->visibility && $reflector->isProtected()) {
             $isMatch = true;
         }
-        if (Constants::VISIBILITY_PUBLIC & $this->visibility && $reflector->isPrivate()) {
+        if (Constants::VISIBILITY_PUBLIC & $this->visibility && $reflector->isPublic()) {
             $isMatch = true;
         }
 
@@ -55,7 +55,7 @@ class MatcherVisibility implements  MatcherConstant, MatcherMethod
         if (Constants::VISIBILITY_PROTECTED & $this->visibility && $reflector->isProtected()) {
             $isMatch = true;
         }
-        if (Constants::VISIBILITY_PUBLIC & $this->visibility && $reflector->isPrivate()) {
+        if (Constants::VISIBILITY_PUBLIC & $this->visibility && $reflector->isPublic()) {
             $isMatch = true;
         }
 

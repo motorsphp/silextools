@@ -22,20 +22,21 @@ class SelectorBuilder
 
     public static function selector(\Closure $configurator): SelectorMatcher
     {
-        return SelectorBuilder::instance($configurator)->build();
+        return SelectorBuilder::instance()->add($configurator)->build();
     }
 
-    public static function instance(\Closure $configurator = null): SelectorBuilder
+    public static function instance(ConstantsReader $reader = null): SelectorBuilder
     {
-        $parser = new DocParser();
-        $reader = new AnnotationReader($parser);
-        $constantsReader = new ConstantsReader($parser, $reader);
-        $builder = new SelectorBuilder($constantsReader);
-
-        if (!is_null($configurator)) {
-            $builder->add($configurator);
+        $constantsReader = null;
+        if (is_null($reader)) {
+            $parser = new DocParser();
+            $reader = new AnnotationReader($parser);
+            $constantsReader = new ConstantsReader($parser, $reader);
+        } else {
+            $constantsReader = $reader;
         }
-        return $builder;
+
+        return new SelectorBuilder($constantsReader);
     }
 
     /**
@@ -59,6 +60,12 @@ class SelectorBuilder
 
         $this->matchers[] = $builder->build();
         return $this;
+    }
+
+    public function addAndBuild(\Closure $configurator): SelectorMatcher
+    {
+        $this->add($configurator);
+        return $this->build();
     }
 
     public function build() : SelectorMatcher
