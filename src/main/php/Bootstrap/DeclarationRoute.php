@@ -61,7 +61,7 @@ EOT;
             $reflection->getDeclaringClass()->getShortName()
         );
         $this->serviceMethod = $reflection->getShortName();
-        $this->import[] = $reflection->getDeclaringClass()->getNamespaceName();
+        $this->import[] = $reflection->getDeclaringClass()->getName();
 
         return $this;
     }
