@@ -3,7 +3,7 @@
 use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 use Nette\PhpGenerator\PhpLiteral;
 
-class DeclarationProvider
+class DeclarationProvider implements Declaration
 {
     /**
      * @var string

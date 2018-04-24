@@ -14,6 +14,11 @@ class BootstrapMethodBuilder
     private $argContainerType;
 
     /**
+     * @var array[]
+     */
+    private $otherArgs = [];
+
+    /**
      * @var string
      */
     private $methodName;
@@ -44,15 +49,51 @@ class BootstrapMethodBuilder
         return $builder;
     }
 
+    public static function configureHttp() : BootstrapMethodBuilder
+    {
+        $builder = new BootstrapMethodBuilder();
+        $builder->setMethodName(__FUNCTION__);
+
+        return $builder;
+    }
+
     public function setMethodName(string $name) : BootstrapMethodBuilder
     {
         $this->methodName = $name;
         return $this;
     }
 
+    /**
+     * @param $class
+     * @return BootstrapMethodBuilder
+     * @throws \ReflectionException
+     */
+    public function withArgContainerTypeFromString(string $class): BootstrapMethodBuilder
+    {
+        return $this->setArgContainerType(new \ReflectionClass($class));
+    }
+
     public function setArgContainerType(\ReflectionClass $reflection): BootstrapMethodBuilder
     {
         $this->argContainerType = $reflection;
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param string $type
+     * @return BootstrapMethodBuilder
+     * @throws \ReflectionException
+     */
+    public function addArgumentFromString(string $name, string $type) : BootstrapMethodBuilder
+    {
+        $reflection = new \ReflectionClass($type);
+        return $this->addArgument($name, $reflection);
+    }
+
+    public function addArgument(string $name, \ReflectionClass $type) : BootstrapMethodBuilder
+    {
+        $this->otherArgs[] = [$name, $type];
         return $this;
     }
 
@@ -110,6 +151,15 @@ class BootstrapMethodBuilder
             ->addParameter('container')
             ->setTypeHint($this->argContainerType->getShortName())
         ;
+
+        foreach ($this->otherArgs as $nameAndType)
+        {
+            list($name, $type) = $nameAndType;
+            $method
+                ->addParameter($name)
+                ->setTypeHint($type->getShortName())
+            ;
+        }
 
         return $method;
     }

@@ -87,7 +87,7 @@ class PatternBuilderMethod
 
     /**
      * @param string $annotation
-     * @param bool $ignoreTarget
+     * @param bool $ignoreTarget enable or disable check for the annotations target
      * @return PatternBuilderMethod
      * @throws \ReflectionException
      */

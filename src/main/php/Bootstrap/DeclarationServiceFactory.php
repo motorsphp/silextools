@@ -3,7 +3,7 @@
 use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 use Nette\PhpGenerator\PhpLiteral;
 
-class DeclarationServiceFactory
+class DeclarationServiceFactory implements Declaration
 {
     private static $tokens = [
         T_DOUBLE_COLON => '::'

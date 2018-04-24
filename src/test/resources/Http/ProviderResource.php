@@ -23,7 +23,7 @@ class ProviderResource
         $app->view($healthcheckRenderer);
 
         $serviceMethod = implode(':', [HealthCheckController::class, 'get']);
-        $controllers->get('/monitoring/healthcheck', $serviceMethod)->convert();
+        //$controllers->get('/monitoring/healthcheck', $serviceMethod)->convert()->;
     }
 
     /**

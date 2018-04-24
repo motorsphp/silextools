@@ -48,23 +48,23 @@ class SelectorMatcherTest extends TestCase
             return $builder->setName(ContainerKey::class)
                 ->constantPattern(ContainerKey::class)->annotation(ContainerKey::class)->visibility(Constants::VISIBILITY_ANY)
                 ->and()
-                ->methodPattern(ServiceFactory::class)
-                ->annotation(ServiceFactory::class, true)
-                ->modifiers(Constants::MODIFIER_STATIC)
+                    ->methodPattern(ServiceFactory::class)
+                    ->annotation(ServiceFactory::class, true)
+                    ->modifiers(Constants::MODIFIER_STATIC)
                 ->and()
-                ->methodPattern('controller')->annotation(Get::class, true)
+                    ->methodPattern('controller')->annotation(Get::class, true)
                 ->and()
-                ->methodPattern('controller')->annotation(Post::class, true)
+                    ->methodPattern('controller')->annotation(Post::class, true)
                 ->and()
-                ->methodPattern('controller')->annotation(Put::class, true)
+                    ->methodPattern('controller')->annotation(Put::class, true)
                 ->and()
-                ->methodPattern('controller')->annotation(Delete::class, true)
+                    ->methodPattern('controller')->annotation(Delete::class, true)
                 ->and()
-                ->classPattern( ServiceProviderInterface::class)->implements(ServiceProviderInterface::class)
+                    ->classPattern( ServiceProviderInterface::class)->implements(ServiceProviderInterface::class)
                 ->and()
-                ->methodPattern(ControllerFactory::class)->annotation(ControllerFactory::class)
+                    ->methodPattern(ControllerFactory::class)->annotation(ControllerFactory::class)
                 ->and()
-                ->methodPattern(ParamConverter::class)->annotation(ParamConverter::class)
+                    ->methodPattern(ParamConverter::class)->annotation(ParamConverter::class)
                 ->expression()
                 ;
             }
@@ -80,6 +80,9 @@ class SelectorMatcherTest extends TestCase
         }
         foreach ($matches->getClasses(ServiceProviderInterface::class) as $reflection) {
             $bootstrapBuilder->addProvider($reflection);
+        }
+        foreach ($matches->getMethods('controller') as $reflection) {
+            $bootstrapBuilder->addController($reflection);
         }
 
         $x = $bootstrapBuilder->build();
