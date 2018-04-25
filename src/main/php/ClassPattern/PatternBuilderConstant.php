@@ -4,7 +4,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 use Doctrine\Common\Annotations\Reader;
 
-class PatternBuilderConstant
+class PatternBuilderConstant extends PatterBuilderAbstract
 {
     /**
      * @var string
@@ -93,11 +93,6 @@ class PatternBuilderConstant
         $this->visibility = $bitmask;
 
         return $this;
-    }
-
-    public function expression(): PatternBuilder
-    {
-        return $this->and();
     }
 
     public function and(): PatternBuilder

@@ -4,7 +4,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 use Doctrine\Common\Annotations\Reader;
 
-class PatternBuilderClass
+class PatternBuilderClass extends PatterBuilderAbstract
 {
     /**
      * @var string

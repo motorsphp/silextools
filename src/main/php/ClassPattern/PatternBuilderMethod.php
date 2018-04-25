@@ -4,7 +4,7 @@ use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\Target;
 use Doctrine\Common\Annotations\Reader;
 
-class PatternBuilderMethod
+class PatternBuilderMethod extends PatterBuilderAbstract
 {
     /**
      * @var string
@@ -119,11 +119,6 @@ class PatternBuilderMethod
         $this->confirmAnnotation($annotation, $reflection);
         $this->annotations =  MatchPolicyAnnotations::matchAll([$annotation]);
         return $this;
-    }
-
-    public function expression(): PatternBuilder
-    {
-        return $this->and();
     }
 
     public function and(): PatternBuilder
