@@ -8,7 +8,7 @@ class PatternConstant implements Pattern
     private $id;
 
     /**
-     * @var array|string[]
+     * @var MatchPolicyAnnotations
      */
     private $annotations;
 
@@ -17,7 +17,7 @@ class PatternConstant implements Pattern
      */
     private $visibility;
 
-    public function __construct(PatternId $id, array $annotations, int $visibility = 0)
+    public function __construct(PatternId $id, MatchPolicyAnnotations $annotations = null, int $visibility = 0)
     {
         $this->id = $id;
         $this->annotations = $annotations;
@@ -32,12 +32,25 @@ class PatternConstant implements Pattern
         return $this->id;
     }
 
+    public function getAnnotationsMatchPolicy() : string
+    {
+        if ($this->annotations) {
+            return $this->annotations->getPolicy();
+        }
+
+        return MatchPolicyAnnotations::MATCH_IGNORE;
+    }
+
     /**
      * @return array|string[]
      */
     public function getAnnotations() : array
     {
-        return $this->annotations;
+        if ($this->annotations) {
+            return $this->annotations->getAnnotations();
+        }
+
+        return [];
     }
 
     /**
@@ -50,7 +63,7 @@ class PatternConstant implements Pattern
 
     public function configureMatcher(MatcherConfigurator $builder)
     {
-        if (count($this->annotations)) {
+        if ($this->annotations) {
             $builder->addAnnotationsConstant($this);
         }
 

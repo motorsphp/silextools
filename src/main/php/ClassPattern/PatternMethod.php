@@ -8,7 +8,7 @@ class PatternMethod implements Pattern
     private $id;
 
     /**
-     * @var array|string[]
+     * @var MatchPolicyAnnotations
      */
     private $annotations;
 
@@ -22,7 +22,7 @@ class PatternMethod implements Pattern
      */
     private $modifiers;
 
-    public function __construct(PatternId $id, array $annotations, int $visibility = 0, int $modifiers = 0)
+    public function __construct(PatternId $id, MatchPolicyAnnotations $annotations = null, int $visibility = 0, int $modifiers = 0)
     {
         $this->id = $id;
         $this->annotations = $annotations;
@@ -38,12 +38,25 @@ class PatternMethod implements Pattern
         return $this->id;
     }
 
+    public function getAnnotationsMatchPolicy() : string
+    {
+        if ($this->annotations) {
+            return $this->annotations->getPolicy();
+        }
+
+        return MatchPolicyAnnotations::MATCH_IGNORE;
+    }
+
     /**
      * @return array|string[]
      */
     public function getAnnotations() : array
     {
-        return $this->annotations;
+        if ($this->annotations) {
+            return $this->annotations->getAnnotations();
+        }
+
+        return [];
     }
 
     public function getModifiers(): ?int
@@ -61,7 +74,7 @@ class PatternMethod implements Pattern
 
     public function configureMatcher(MatcherConfigurator $collector)
     {
-        if (count($this->annotations)) {
+        if ($this->annotations) {
             $collector->addAnnotationsMethod($this);
         }
 

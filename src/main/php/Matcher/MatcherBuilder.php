@@ -86,7 +86,7 @@ class MatcherBuilder implements MatcherConfigurator
         $this->methodMatchers[] = new MatcherAnnotations(
             $patternId,
             $annotations,
-            $matchType = 'all',
+            $matchType = $pattern->getAnnotationsMatchPolicy(),
             $this->reader
         );
         $this->patterns[$patternId->toString()] = $patternId;
@@ -101,7 +101,7 @@ class MatcherBuilder implements MatcherConfigurator
         $this->constantMatchers[] = new MatcherAnnotations(
             $patternId,
             $annotations,
-            $matchType = 'all',
+            $matchType = $pattern->getAnnotationsMatchPolicy(),
             $this->reader
         );
         $this->patterns[$patternId->toString()] = $patternId;

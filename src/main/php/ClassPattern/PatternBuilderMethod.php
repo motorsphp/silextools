@@ -12,9 +12,9 @@ class PatternBuilderMethod
     private $matchKey;
 
     /**
-     * @var array | string[]
+     * @var MatchPolicyAnnotations
      */
-    private $annotations = [];
+    private $annotations = null;
 
     /**
      * @var string
@@ -74,14 +74,32 @@ class PatternBuilderMethod
      * @return PatternBuilderMethod
      * @throws \ReflectionException
      */
-    public function annotations(array $annotations) : PatternBuilderMethod
+    public function anyAnnotation(...$annotations) : PatternBuilderMethod
     {
         foreach ($annotations as $annotation) {
             $reflection = new \ReflectionClass($annotation);
-            $this->confirmAnnotation($annotation, $reflection)->confirmTarget($annotation, $reflection);
-            $this->annotations[] = $annotation;
+//            $this->confirmAnnotation($annotation, $reflection)->confirmTarget($annotation, $reflection);
+            $this->confirmAnnotation($annotation, $reflection);
         }
 
+        $this->annotations = MatchPolicyAnnotations::matchAny($annotations);
+        return $this;
+    }
+
+    /**
+     * @param array $annotations
+     * @return PatternBuilderMethod
+     * @throws \ReflectionException
+     */
+    public function allAnnotations(...$annotations) : PatternBuilderMethod
+    {
+        foreach ($annotations as $annotation) {
+            $reflection = new \ReflectionClass($annotation);
+//            $this->confirmAnnotation($annotation, $reflection)->confirmTarget($annotation, $reflection);
+            $this->confirmAnnotation($annotation, $reflection);
+        }
+
+        $this->annotations = MatchPolicyAnnotations::matchAll($annotations);
         return $this;
     }
 
@@ -94,12 +112,12 @@ class PatternBuilderMethod
     public function annotation(string $annotation, $ignoreTarget = false): PatternBuilderMethod
     {
         if (! $ignoreTarget) {
-            return $this->annotations([$annotation]);
+            return $this->allAnnotations($annotation);
         }
 
         $reflection = new \ReflectionClass($annotation);
         $this->confirmAnnotation($annotation, $reflection);
-        $this->annotations[] = $annotation;
+        $this->annotations =  MatchPolicyAnnotations::matchAll([$annotation]);
         return $this;
     }
 

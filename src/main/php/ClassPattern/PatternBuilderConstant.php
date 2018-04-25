@@ -11,7 +11,10 @@ class PatternBuilderConstant
      */
     private $matchKey;
 
-    private $annotations = [];
+    /**
+     * @var MatchPolicyAnnotations
+     */
+    private $annotations = null;
 
     /**
      * @var Reader
@@ -46,15 +49,31 @@ class PatternBuilderConstant
      * @return PatternBuilderConstant
      * @throws \ReflectionException
      */
-    public function annotations(array $annotations) : PatternBuilderConstant
+    public function anyAnnotation(...$annotations) : PatternBuilderConstant
     {
         foreach ($annotations as $annotation) {
             $this->confirmAnnotation($annotation);
-            $this->annotations[] = $annotation;
         }
 
+        $this->annotations = MatchPolicyAnnotations::matchAny($annotations);
         return $this;
     }
+
+    /**
+     * @param array $annotations
+     * @return PatternBuilderConstant
+     * @throws \ReflectionException
+     */
+    public function allAnnotations(...$annotations) : PatternBuilderConstant
+    {
+        foreach ($annotations as $annotation) {
+            $this->confirmAnnotation($annotation);
+        }
+
+        $this->annotations = MatchPolicyAnnotations::matchAll($annotations);
+        return $this;
+    }
+
 
     /**
      * @param string $annotation
@@ -63,7 +82,7 @@ class PatternBuilderConstant
      */
     public function annotation(string $annotation): PatternBuilderConstant
     {
-        return $this->annotations([$annotation]);
+        return $this->allAnnotations($annotation);
     }
 
     public function visibility(...$params) : PatternBuilderConstant
