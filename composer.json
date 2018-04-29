@@ -11,7 +11,10 @@
     ],
     "require": {
         "nette/php-generator": "^3.1",
-        "phramz/doctrine-annotation-scanner": "^1.0"
+        "phramz/doctrine-annotation-scanner": "^1.0",
+        "motorphp/silexannotations": "dev-develop",
+        "zircote/swagger-php": "^2.0",
+        "silex/silex": "^2.2"
     },
     "autoload": {
         "psr-4": {
@@ -36,10 +39,8 @@
             "url": "../silexannotations"
         }
     },
+
     "require-dev": {
-        "silex/silex": "^2.2",
-        "phpunit/phpunit": "^7.1",
-        "zircote/swagger-php": "^2.0",
-        "motorphp/silexannotations": "dev-develop"
+        "phpunit/phpunit": "^7.1"
     }
 }

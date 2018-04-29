@@ -5,6 +5,7 @@ use Motorphp\SilexTools\ClassPattern\PatternBuilder;
 use Motorphp\SilexTools\ClassScanner\ClassFile;
 use Motorphp\SilexTools\ClassScanner\Scanner;
 use PHPUnit\Framework\TestCase;
+use Resource\Http\HealthCheckFactories;
 use Swagger\Annotations\Get;
 
 class FilterMatcherTest  extends TestCase

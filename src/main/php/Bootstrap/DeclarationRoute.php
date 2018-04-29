@@ -25,7 +25,7 @@ class DeclarationRoute implements Declaration
 
     private $paramConverters;
 
-    public function build(BootstrapMethodBuilder $builder): BootstrapMethodBuilder
+    public function build(): MethodBodyPart
     {
         $template = <<<'EOT'
 $serviceMethod = implode(':', [?, ?]);
@@ -33,9 +33,7 @@ $controllers->?(?, $serviceMethod);
 EOT;
         $params = [$this->serviceKey, $this->serviceMethod, $this->httpMethod, $this->httpPath];
 
-        $builder->addMethodBody(new MethodBodyPart($template, $params));
-        $builder->addImports($this->import);
-        return $builder;
+        return new MethodBodyPart($template, $params, $this->import);
     }
 
     public function canBuild(): bool
@@ -61,7 +59,7 @@ EOT;
             $reflection->getDeclaringClass()->getShortName()
         );
         $this->serviceMethod = $reflection->getShortName();
-        $this->import[] = $reflection->getDeclaringClass()->getName();
+        $this->import[] = $reflection->getDeclaringClass();
 
         return $this;
     }

@@ -6,7 +6,7 @@ use Nette\PhpGenerator\PhpLiteral;
 class DeclarationProvider implements Declaration
 {
     /**
-     * @var string
+     * @var \ReflectionClass
      */
     private $import;
 
@@ -17,7 +17,7 @@ class DeclarationProvider implements Declaration
 
     public function setProviderFromClass(\ReflectionClass $reflection) : DeclarationProvider
     {
-        $this->import = $reflection->getName();
+        $this->import = $reflection;
         $this->provider = $reflection->getShortName();
         $this->provider = new PhpLiteral($this->provider);
 
@@ -30,10 +30,9 @@ class DeclarationProvider implements Declaration
     }
 
     /**
-     * @param BootstrapMethodBuilder $builder
-     * @return BootstrapMethodBuilder
+     * @return MethodBodyPart
      */
-    public function build(BootstrapMethodBuilder $builder): BootstrapMethodBuilder
+    public function build(): MethodBodyPart
     {
         $bodyPartTemplate = <<<'EOT'
 $provider = new ?();
@@ -41,10 +40,6 @@ $provider->register($container);
 
 
 EOT;
-        $bodyPart = new MethodBodyPart($bodyPartTemplate, [$this->provider]);
-        $builder->addMethodBody($bodyPart);
-
-        $builder->addImports([$this->import]);
-        return $builder;
+        return new MethodBodyPart($bodyPartTemplate, [$this->provider], [$this->import]);
     }
 }

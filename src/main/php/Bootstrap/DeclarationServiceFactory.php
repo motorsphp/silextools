@@ -24,7 +24,7 @@ class DeclarationServiceFactory implements Declaration
     public function addKeyFromConstant(\ReflectionClassConstant $reflection) : DeclarationServiceFactory
     {
         $declaringClass = $reflection->getDeclaringClass();
-        $this->imports[] = $declaringClass->getName();
+        $this->imports[] = $declaringClass;
 
         $this->key = $declaringClass->getShortName()
             . self::$tokens[T_DOUBLE_COLON]
@@ -38,7 +38,7 @@ class DeclarationServiceFactory implements Declaration
     public function addFactoryFromMethod(\ReflectionMethod $reflection) : DeclarationServiceFactory
     {
         $declaringClass = $reflection->getDeclaringClass();
-        $this->imports[] = $declaringClass->getName();
+        $this->imports[] = $declaringClass;
 
         $this->factory = $declaringClass->getShortName()
             . self::$tokens[T_DOUBLE_COLON]
@@ -55,10 +55,9 @@ class DeclarationServiceFactory implements Declaration
     }
 
     /**
-     * @param BootstrapMethodBuilder $builder
-     * @return BootstrapMethodBuilder
+     * @return MethodBodyPart
      */
-    public function build(BootstrapMethodBuilder $builder): BootstrapMethodBuilder
+    public function build(): MethodBodyPart
     {
         $bodyPartTemplate = <<<'EOT'
 $container->offsetSet(?, function (Container $container) {
@@ -66,10 +65,6 @@ $container->offsetSet(?, function (Container $container) {
 });
 
 EOT;
-        $bodyPart = new MethodBodyPart($bodyPartTemplate, [$this->key, $this->factory]);
-        $builder->addMethodBody($bodyPart);
-
-        $builder->addImports($this->imports);
-        return $builder;
+        return new MethodBodyPart($bodyPartTemplate, [$this->key, $this->factory], $this->imports);
     }
 }

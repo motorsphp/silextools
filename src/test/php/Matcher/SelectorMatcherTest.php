@@ -5,7 +5,7 @@ use Motorphp\SilexAnnotations\Common\ControllerFactory;
 use Motorphp\SilexAnnotations\Common\ParamConverter;
 use Motorphp\SilexAnnotations\Common\ServiceFactory;
 use Motorphp\SilexAnnotations\Reader\ConstantsReader;
-use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
+use Motorphp\SilexTools\Bootstrap\Builders;
 use Motorphp\SilexTools\ClassPattern\Constants;
 use Motorphp\SilexTools\ClassPattern\PatternBuilder;
 use Motorphp\SilexTools\ClassScanner\ClassFile;
@@ -13,6 +13,7 @@ use Motorphp\SilexTools\ClassScanner\Scanner;
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Resource\Bootstrap\BootstrapInterface;
 use Resource\Http\HealthCheckFactories;
 use Resource\Providers\DummyProvider;
 
@@ -24,32 +25,21 @@ use Swagger\Annotations\Put;
 class SelectorMatcherTest extends TestCase
 {
     /**
-     * @throws \Doctrine\Common\Annotations\AnnotationException
      * @throws \ReflectionException
      */
     public function testEverything()
     {
-        $scanner = new Scanner();
-
         $scanSources = [
-            new \ReflectionClass(HealthCheckFactories::class),
-            new \ReflectionClass(DummyProvider::class)
+            dirname((new \ReflectionClass(HealthCheckFactories::class))->getFileName()),
+            dirname((new \ReflectionClass(DummyProvider::class))->getFileName())
         ];
-        $scanSources = array_map(function (\ReflectionClass $reflection) {
-            return dirname($reflection->getFileName());
-        }, $scanSources);
-        $classFiles = $scanner->scanAll($scanSources);
-        $classes = array_map(function (ClassFile $class) {
-            return $class->getClassName();
-        }, $classFiles);
 
-        $reader = ConstantsReader::instance();
-        $selector = SelectorBuilder::instance($reader)->addAndBuild(function (PatternBuilder $builder) {
+        $patternBuilder = function (PatternBuilder $builder) {
             return $builder->setName(ContainerKey::class)
-                ->constantPattern(ContainerKey::class)->annotation(ContainerKey::class)->visibility(Constants::VISIBILITY_ANY)
+                ->constantPattern(ContainerKey::class)
+                    ->annotation(ContainerKey::class)->visibility(Constants::VISIBILITY_ANY)
                 ->andMethod(ServiceFactory::class)
-                    ->annotation(ServiceFactory::class, true)
-                    ->modifiers(Constants::MODIFIER_STATIC)
+                    ->annotation(ServiceFactory::class, true)->modifiers(Constants::MODIFIER_STATIC)
                 ->andMethod('controller')
                     ->anyAnnotation(Get::class, Post::class, Put::class, Delete::class)
                 ->andClass(ServiceProviderInterface::class)
@@ -59,37 +49,32 @@ class SelectorMatcherTest extends TestCase
                 ->andMethod(ParamConverter::class)
                     ->annotation(ParamConverter::class)
                 ->expression()
-                ;
-            }
-        );
-        $matches = $selector->select($classes);
+            ;
+        };
 
-        $bootstrapBuilder = BootstrapBuilder::withContainerType($reader, Container::class);
-        foreach ($matches->getMethods(ServiceFactory::class) as $reflection) {
-            $bootstrapBuilder->addServiceFactory($reflection);
-        }
-        foreach ($matches->getConstants(ContainerKey::class) as $reflection) {
-            $bootstrapBuilder->addFactoryKey($reflection);
-        }
-        foreach ($matches->getClasses(ServiceProviderInterface::class) as $reflection) {
-            $bootstrapBuilder->addProvider($reflection);
-        }
-        foreach ($matches->getMethods('controller') as $reflection) {
-            $bootstrapBuilder->addController($reflection);
-        }
+        $reader = ConstantsReader::instance();
 
-        $x = $bootstrapBuilder->build();
-        die($x);
+        $matches = Matches::scanAndSelect($scanSources, new Scanner(), SelectorBuilder::instance($reader)->addAndBuild($patternBuilder));
+        $contents = Builders::configureFactories(BootstrapInterface::class, $reader)
+            ->addAllServiceFactories(
+                $matches->getMethods(ServiceFactory::class)
+            )
+            ->addAllFactoryKeys(
+                $matches->getConstants(ContainerKey::class)
+            )
+            ->configureProviders(BootstrapInterface::class)
+                ->addAllProviders(
+                    $matches->getClasses(ServiceProviderInterface::class)
+                )
+            ->configureHttp(BootstrapInterface::class)
+                ->addAllControllers(
+                    $matches->getMethods('controller')
+                )
+            ->buildClass()
+                ->build()
+            ;
 
-        $methods = $matches->getMethods('controller');
-        var_dump($methods);
-
-        $method = $methods[0];
-        die($method->getReturnType()->getName());
-
-        $methods = $matches->getMethods(ControllerFactory::class);
-        var_dump($methods);
-
-        die('ss');
+        static::assertNotEmpty($contents);
+        die($contents);
     }
 }
