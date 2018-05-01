@@ -2,13 +2,13 @@
 
 class ClassFileParser
 {
-    public function parseString($location, $file): ClassFile
+    public function parseString($location, $file): ?ClassFile
     {
         $tokens = token_get_all($file);
         return $this->parse($location, $tokens);
     }
 
-    public function parseSplFile(\SplFileInfo $file): ClassFile
+    public function parseSplFile(\SplFileInfo $file): ?ClassFile
     {
         $path = $file->getRealPath();
         $contents = file_get_contents($path);
@@ -19,13 +19,13 @@ class ClassFileParser
      * @param $file
      * @return ClassFile
      */
-    public function parseFile($file): ClassFile
+    public function parseFile($file): ?ClassFile
     {
         $contents = file_get_contents($file);
         return $this->parseString($file, $contents);
     }
 
-    public function parse($file, array $tokens): ClassFile
+    public function parse($file, array $tokens): ?ClassFile
     {
         $namespace = null;
         $classname = null;
@@ -41,9 +41,13 @@ class ClassFileParser
             }
 
             if (T_CLASS === $tokens[$offset][0]) {
-                $classname = $this->parseClassName($tokens, $offset);
+                $classname = $this->parseClassname($tokens, $offset);
                 break;
             }
+        }
+
+        if (empty($classname)) {
+            return null;
         }
 
         return new ClassFile($classname, $namespace, $file);

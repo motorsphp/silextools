@@ -22,8 +22,9 @@ class Scanner
         foreach ($finder as $file) {
             $parser = new ClassFileParser();
             $classFile = $parser->parseSplFile($file);
-
-            $classFiles[] = $classFile;
+            if ($classFile) {
+                $classFiles[] = $classFile;
+            }
         }
 
         return $classFiles;

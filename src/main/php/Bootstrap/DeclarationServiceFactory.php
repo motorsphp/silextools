@@ -21,6 +21,12 @@ class DeclarationServiceFactory implements Declaration
 
     private $imports = [];
 
+    public function addKeyFromString(string $key) : DeclarationServiceFactory
+    {
+        $this->key = $key;
+        return $this;
+    }
+
     public function addKeyFromConstant(\ReflectionClassConstant $reflection) : DeclarationServiceFactory
     {
         $declaringClass = $reflection->getDeclaringClass();

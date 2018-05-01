@@ -120,6 +120,7 @@ class BuildConfigureFactories
         /** @var ServiceFactory $annotation */
         $annotation = $reader->getMethodAnnotation($reflection, ServiceFactory::class);
 
+        $serviceKey = $annotation->service;
         $correlationKey = $annotation->service;
         if (empty($correlationKey)) { // infer the container key from the return type
             $returnType = $reflection->getReturnType();
@@ -134,6 +135,10 @@ class BuildConfigureFactories
 
         $builder = $this->getOrCreateServiceDeclarationBuilder($correlationKey);
         $builder->addFactoryFromMethod($reflection);
+
+        if (! empty($serviceKey)) {
+            $builder->addKeyFromString($serviceKey);
+        }
 
         return $this;
     }

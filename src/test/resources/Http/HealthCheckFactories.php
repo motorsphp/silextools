@@ -1,6 +1,5 @@
 <?php namespace Resource\Http;
 
-use Helstern\SMSkeleton\HttpApi\Serializer;
 use Pimple\Container;
 use Symfony\Component\HttpFoundation\Request;
 

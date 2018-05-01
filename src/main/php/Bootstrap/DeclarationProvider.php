@@ -35,8 +35,7 @@ class DeclarationProvider implements Declaration
     public function build(): MethodBodyPart
     {
         $bodyPartTemplate = <<<'EOT'
-$provider = new ?();
-$provider->register($container);
+$container->register(new ?());
 
 
 EOT;

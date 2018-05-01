@@ -8,7 +8,7 @@ class ClassFile
 
     private $file;
 
-    public function __construct(string $className, string $namespace, string $file)
+    public function __construct(string $className, string $namespace = null, string $file)
     {
         $this->className = $className;
         $this->namespace = $namespace;
@@ -30,7 +30,7 @@ class ClassFile
         return implode('\\', [ $this->namespace, $this->className ]);
     }
 
-    public function getNamespace(): string
+    public function getNamespace(): ?string
     {
         return $this->namespace;
     }

@@ -20,15 +20,48 @@ class BuildBootstrap
         $this->context = $context;
     }
 
+    /**
+     * @param string $class
+     * @return BuildBootstrap
+     * @throws \ReflectionException
+     */
+    public function withSameNamespaceAs(string $class) : BuildBootstrap
+    {
+        $reflection = new \ReflectionClass($class);
+        $this->namespace = $reflection->getNamespaceName();
+        return $this;
+    }
+
     public function withNamespace(string $namespace) : BuildBootstrap
     {
         $this->namespace = $namespace;
         return $this;
     }
 
+    /**
+     * @param string $class
+     * @return BuildBootstrap
+     * @throws \ReflectionException
+     */
+    public function withSameNameAs(string $class) : BuildBootstrap
+    {
+        $reflection = new \ReflectionClass($class);
+        $this->name = $reflection->getShortName();
+        return $this;
+    }
+
     public function withName(string $name) : BuildBootstrap
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function sameAs(string $class): BuildBootstrap
+    {
+        $reflection = new \ReflectionClass($class);
+        $this->namespace = $reflection->getNamespaceName();
+        $this->name = $reflection->getShortName();
+
         return $this;
     }
 
