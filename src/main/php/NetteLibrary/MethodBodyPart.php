@@ -56,8 +56,6 @@ class MethodBodyPart
         return $this->imports;
     }
 
-
-
     public function merge(MethodBodyPart $other): MethodBodyPart
     {
         $body = $this->body . $other->body;

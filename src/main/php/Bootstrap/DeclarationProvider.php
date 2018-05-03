@@ -36,9 +36,8 @@ class DeclarationProvider implements Declaration
     {
         $bodyPartTemplate = <<<'EOT'
 $container->register(new ?());
-
-
 EOT;
+        $bodyPartTemplate .= PHP_EOL;
         return new MethodBodyPart($bodyPartTemplate, [$this->provider], [$this->import]);
     }
 }

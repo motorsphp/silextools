@@ -69,6 +69,9 @@ class Generators
             ->addAllControllers(
                 $matches->getMethods('controller')
             )
+            ->addAllConverters(
+                $matches->getMethods(ParamConverter::class)
+            )
             ->buildClass()->sameAs($class)
             ->build()
         ;

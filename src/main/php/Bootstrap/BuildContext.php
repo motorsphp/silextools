@@ -5,16 +5,51 @@ use Nette\PhpGenerator\Method;
 
 class BuildContext
 {
-    private $methods = [];
-
-    private $imports = [];
-
     /** @var ConstantsReader  */
     private $reader;
+
+    /** @var array|Method[] */
+    private $methods = [];
+
+    /** @var array|\ReflectionClass[]  */
+    private $imports = [];
+
+    /** @var array|\ReflectionClassConstant[]  */
+    private $names = [];
 
     public function __construct(ConstantsReader $reader)
     {
         $this->reader = $reader;
+    }
+
+    public function getFirstName(string $name) : ?\ReflectionClassConstant
+    {
+        $entry = null;
+        if (array_key_exists($name, $this->names)) {
+            $entry = $this->names[$name];
+        }
+
+        if (is_array($entry)) {
+            return $entry[0];
+        }
+
+        return $entry;
+    }
+
+    public function addName(string $name, \ReflectionClassConstant $constant) : BuildContext
+    {
+        if (array_key_exists($name, $this->names)) {
+            $entry = $this->names[$name];
+            if (is_array($entry)) {
+                $entry[] = $constant;
+            } else {
+                $this->names[$name] = [$entry, $constant];
+            }
+        } else {
+            $this->names[$name] = $constant;
+        }
+
+        return $this;
     }
 
     public function withMethod(Method $method) : BuildContext

@@ -14,7 +14,7 @@ class BuildConfigureFactories
     private $context;
 
     /**
-     * @var array|DeclarationServiceFactory[]
+     * @var array|DeclarationFactory[]
      */
     private $factories = [];
 
@@ -54,10 +54,18 @@ class BuildConfigureFactories
 
     private function build() : BuildContext
     {
-        $declarations = array_filter($this->factories, function (DeclarationServiceFactory $a) {
+        $declarations = array_filter($this->factories, function (DeclarationFactory $a) {
             return $a->canBuild();
         });
-        $parts = array_map(function (DeclarationServiceFactory $a) {
+
+        foreach ($declarations as $serviceKey => $declaration) {
+            $name = $this->context->getFirstName($serviceKey);
+            if ($name) {
+                $declaration->withKeyFromConstant($name);
+            }
+        }
+
+        $parts = array_map(function (DeclarationFactory $a) {
             return $a->build();
         }, $declarations);
 
@@ -83,25 +91,18 @@ class BuildConfigureFactories
 
     public function addFactoryKey(\ReflectionClassConstant $reflection) : BuildConfigureFactories
     {
-        $correlationKey = null;
+        $serviceKey = null;
         $reader = $this->context->getAnnotationsReader();
+
         /** @var ContainerKey $annotation */
         $annotation = $reader->getConstantAnnotation($reflection, ContainerKey::class);
-        if (!empty($annotation->for)) {
-            $correlationKey = $annotation->for;
+        if (empty($annotation->service)) {
+            $serviceKey = $reflection->getDeclaringClass()->getName();
+        } else {
+            $serviceKey = $annotation->service;
         }
 
-        if (empty($correlationKey)) {
-            $correlationKey = $reflection->getDeclaringClass()->getName();
-        }
-
-        if (empty($correlationKey)) {
-            throw new \RuntimeException('key is empty');
-        }
-
-        $builder = $this->getOrCreateServiceDeclarationBuilder($correlationKey);
-        $builder->addKeyFromConstant($reflection);
-
+        $this->context->addName($serviceKey, $reflection);
         return $this;
     }
 
@@ -120,37 +121,34 @@ class BuildConfigureFactories
         /** @var ServiceFactory $annotation */
         $annotation = $reader->getMethodAnnotation($reflection, ServiceFactory::class);
 
+        $declaration = new DeclarationFactory();
+
         $serviceKey = $annotation->service;
-        $correlationKey = $annotation->service;
-        if (empty($correlationKey)) { // infer the container key from the return type
+        if (empty($serviceKey)) { // infer the container key from the return type
             $returnType = $reflection->getReturnType();
             if (!is_null($returnType)) {
-                $correlationKey = $returnType->getName();
+                $serviceKey = $returnType->getName();
+                if (!$returnType->isBuiltin()) {
+                    try {
+                        $reflectionClass = new \ReflectionClass($serviceKey);
+                        $declaration->withKeyFromClass($reflectionClass);
+                    } catch (\ReflectionException $e) {
+                        $declaration->withKeyFromString($serviceKey);
+                    }
+                }
             }
+        } else {
+            $declaration->withKeyFromString($serviceKey);
         }
 
-        if (empty($correlationKey)) {
+        if (empty($serviceKey)) {
             throw new \DomainException('could not infer the container key');
         }
 
-        $builder = $this->getOrCreateServiceDeclarationBuilder($correlationKey);
-        $builder->addFactoryFromMethod($reflection);
-
-        if (! empty($serviceKey)) {
-            $builder->addKeyFromString($serviceKey);
-        }
+        $declaration->withFactoryFromMethod($reflection);
+        $this->factories[$serviceKey] = $declaration;
 
         return $this;
     }
 
-    private function getOrCreateServiceDeclarationBuilder(string $key): DeclarationServiceFactory
-    {
-        if (! array_key_exists($key, $this->factories)) {
-            $declaration = new DeclarationServiceFactory();
-            $this->factories[$key] = $declaration;
-            return $declaration;
-        }
-
-        return $this->factories[$key];
-    }
 }
