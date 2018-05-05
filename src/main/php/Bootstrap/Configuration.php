@@ -2,7 +2,7 @@
 
 use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 
-interface Declaration
+interface Configuration
 {
     function canBuild(): bool;
 

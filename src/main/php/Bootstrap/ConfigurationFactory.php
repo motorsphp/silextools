@@ -4,7 +4,7 @@ use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 use Motorphp\SilexTools\NetteLibrary\PhpLiterals;
 use Nette\PhpGenerator\PhpLiteral;
 
-class DeclarationFactory implements Declaration
+class ConfigurationFactory implements Configuration
 {
     /**
      * @var string|PhpLiteral
@@ -18,19 +18,19 @@ class DeclarationFactory implements Declaration
 
     private $imports = [];
 
-    public function withKeyFromString(string $key) : DeclarationFactory
+    public function withKeyFromString(string $key) : ConfigurationFactory
     {
         $this->key = $key;
         return $this;
     }
-    public function withKeyFromClass(\ReflectionClass $reflection) : DeclarationFactory
+    public function withKeyFromClass(\ReflectionClass $reflection) : ConfigurationFactory
     {
         $this->imports[] = $reflection;
         $this->key = PhpLiterals::className($reflection);
         return $this;
     }
 
-    public function withKeyFromConstant(\ReflectionClassConstant $reflection) : DeclarationFactory
+    public function withKeyFromConstant(\ReflectionClassConstant $reflection) : ConfigurationFactory
     {
         $declaringClass = $reflection->getDeclaringClass();
         $this->imports[] = $declaringClass;
@@ -39,7 +39,7 @@ class DeclarationFactory implements Declaration
         return $this;
     }
 
-    public function withFactoryFromMethod(\ReflectionMethod $reflection) : DeclarationFactory
+    public function withFactoryFromMethod(\ReflectionMethod $reflection) : ConfigurationFactory
     {
         $declaringClass = $reflection->getDeclaringClass();
         $this->imports[] = $declaringClass;

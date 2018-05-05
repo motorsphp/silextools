@@ -4,7 +4,7 @@ use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 use Motorphp\SilexTools\NetteLibrary\PhpLiterals;
 use Nette\PhpGenerator\PhpLiteral;
 
-class DeclarationRoute implements Declaration
+class ConfigurationRoute implements Configuration
 {
     /**
      * @var string[]
@@ -69,19 +69,19 @@ EOT;
         return true;
     }
 
-    public function withHttpPath(string $path): DeclarationRoute
+    public function withHttpPath(string $path): ConfigurationRoute
     {
         $this->httpPath = $path;
         return $this;
     }
 
-    public function withHttpMethod(string $method): DeclarationRoute
+    public function withHttpMethod(string $method): ConfigurationRoute
     {
         $this->httpMethod = $method;
         return $this;
     }
 
-    public function withController(\ReflectionMethod $reflection): DeclarationRoute
+    public function withController(\ReflectionMethod $reflection): ConfigurationRoute
     {
         $this->serviceCallback = ServiceCallback::fromMethod($reflection);
         $this->import[] = $reflection->getDeclaringClass();
@@ -89,7 +89,7 @@ EOT;
         return $this;
     }
 
-    public function withAllParamConverter(array $converters) : DeclarationRoute
+    public function withAllParamConverter(array $converters) : ConfigurationRoute
     {
         foreach ($converters as $paramName => $callback) {
             $this->withParamConverter($paramName, $callback);
@@ -98,7 +98,7 @@ EOT;
         return $this;
     }
 
-    public function withParamConverter(string $paramName, ServiceCallback $callback) : DeclarationRoute
+    public function withParamConverter(string $paramName, ServiceCallback $callback) : ConfigurationRoute
     {
         $this->paramConverters[$paramName] = $callback;
         return $this;

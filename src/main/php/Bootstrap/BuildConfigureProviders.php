@@ -9,7 +9,7 @@ use Nette\PhpGenerator\Method;
 class BuildConfigureProviders
 {
     /**
-     * @var array| DeclarationRoute[]
+     * @var array| ConfigurationRoute[]
      */
     private $routes = [];
 
@@ -20,7 +20,7 @@ class BuildConfigureProviders
     private $context;
 
     /**
-     * @var array| DeclarationProvider[]
+     * @var array| ConfigurationProvider[]
      */
     private $declarations = [];
 
@@ -72,7 +72,7 @@ class BuildConfigureProviders
 
     public function addProvider(\ReflectionClass $provider) : BuildConfigureProviders
     {
-        $declaration = new DeclarationProvider();
+        $declaration = new ConfigurationProvider();
         $declaration->setProviderFromClass($provider);
         $this->declarations[] = $declaration->build();
 

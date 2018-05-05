@@ -22,7 +22,7 @@ class BuildConfigureHttp
     private $context;
 
     /**
-     * @var array| DeclarationRoute[]
+     * @var array| ConfigurationRoute[]
      */
     private $routes = [];
 
@@ -64,7 +64,7 @@ class BuildConfigureHttp
 
     private function build()
     {
-        $declarations = array_filter($this->routes, function (DeclarationRoute $a) {
+        $declarations = array_filter($this->routes, function (ConfigurationRoute $a) {
             return $a->canBuild();
         });
 
@@ -84,7 +84,7 @@ class BuildConfigureHttp
             }
         }
 
-        $parts = array_map(function (DeclarationRoute $a) {
+        $parts = array_map(function (ConfigurationRoute $a) {
             return $a->build();
         }, $declarations);
 
@@ -244,10 +244,10 @@ class BuildConfigureHttp
         return $class->getName();
     }
 
-    private function getOrCreateDeclarationRouteBuilder(string $key): DeclarationRoute
+    private function getOrCreateDeclarationRouteBuilder(string $key): ConfigurationRoute
     {
         if (! array_key_exists($key, $this->routes)) {
-            $declaration = new DeclarationRoute();
+            $declaration = new ConfigurationRoute();
             $this->routes[$key] = $declaration;
             return $declaration;
         }

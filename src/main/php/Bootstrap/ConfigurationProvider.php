@@ -3,7 +3,7 @@
 use Motorphp\SilexTools\NetteLibrary\MethodBodyPart;
 use Nette\PhpGenerator\PhpLiteral;
 
-class DeclarationProvider implements Declaration
+class ConfigurationProvider implements Configuration
 {
     /**
      * @var \ReflectionClass
@@ -15,7 +15,7 @@ class DeclarationProvider implements Declaration
      */
     private $provider;
 
-    public function setProviderFromClass(\ReflectionClass $reflection) : DeclarationProvider
+    public function setProviderFromClass(\ReflectionClass $reflection) : ConfigurationProvider
     {
         $this->import = $reflection;
         $this->provider = $reflection->getShortName();

@@ -14,7 +14,7 @@ class BuildConfigureFactories
     private $context;
 
     /**
-     * @var array|DeclarationFactory[]
+     * @var array|ConfigurationFactory[]
      */
     private $factories = [];
 
@@ -54,7 +54,7 @@ class BuildConfigureFactories
 
     private function build() : BuildContext
     {
-        $declarations = array_filter($this->factories, function (DeclarationFactory $a) {
+        $declarations = array_filter($this->factories, function (ConfigurationFactory $a) {
             return $a->canBuild();
         });
 
@@ -65,7 +65,7 @@ class BuildConfigureFactories
             }
         }
 
-        $parts = array_map(function (DeclarationFactory $a) {
+        $parts = array_map(function (ConfigurationFactory $a) {
             return $a->build();
         }, $declarations);
 
@@ -121,7 +121,7 @@ class BuildConfigureFactories
         /** @var ServiceFactory $annotation */
         $annotation = $reader->getMethodAnnotation($reflection, ServiceFactory::class);
 
-        $declaration = new DeclarationFactory();
+        $declaration = new ConfigurationFactory();
 
         $serviceKey = $annotation->service;
         if (empty($serviceKey)) { // infer the container key from the return type
