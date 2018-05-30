@@ -7,30 +7,38 @@ use Motorphp\SilexTools\Components\KeyFactories;
 
 class Binding implements ServiceCallback\Binding
 {
+    /** @var string */
+    private $type;
+
+    /** @var string */
+    private $operation;
+
     /** @var ServiceCallback\Binding */
     private $callbackBinding;
 
-    /** @var Controller\ParamPattern */
-    private $paramPattern;
-
     /**
      * Binding constructor.
-     * @param Controller\ParamPattern $paramPattern
+     * @param string $type
+     * @param string $operation
      * @param ServiceCallback\Binding $callbackBinding
      */
-    public function __construct(Controller\ParamPattern $paramPattern, ServiceCallback\Binding $callbackBinding)
+    public function __construct(string $type, string $operation, ServiceCallback\Binding $callbackBinding)
     {
-        $this->paramPattern = $paramPattern;
+        $this->type = $type;
+        $this->operation = $operation;
         $this->callbackBinding = $callbackBinding;
     }
 
-    /**
-     * @param Controller\Param $param
-     * @return bool
-     */
-    public function matches(Controller\Param $param) : bool
+    public function configurePatternBuilder(Controller\ParamPatternBuilder $builder) : Controller\ParamPatternBuilder
     {
-        return $this->paramPattern->matches($param);
+        $builder->matchType($this->type);
+        if (empty($this->operation)) {
+            $builder->matchAnyOperation();
+        } else {
+            $builder->matchOperation($this->operation);
+        }
+
+        return $builder;
     }
 
     public function resolveKey(KeyFactories $keys): Key

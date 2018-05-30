@@ -1,33 +1,21 @@
 <?php namespace Motorphp\SilexTools\Components\Parameter;
 
-use Motorphp\SilexTools\Components\ServiceCallback;
 use Motorphp\SilexTools\Components\Key;
-use Motorphp\SilexTools\Components\KeyFactories;
 use Motorphp\SilexTools\Components\Parameter;
 
 class Builder
 {
-
     /** @var string */
     private $name;
 
     /** @var string */
     private $default;
 
-    /** @var KeyFactories */
-    private $keys;
-
     /** @var Key */
     private $key;
 
     /** @var \ReflectionMethod */
     private $callback;
-
-    public function withBinding(Callback\Binding $binding) : Builder
-    {
-        $this->binding = $binding;
-        return $this;
-    }
 
     /**
      * @param string $name
@@ -66,9 +54,9 @@ class Builder
         return $this;
     }
 
-    public function build() : CallbackComponent
+    public function build() : ComponentAdapter
     {
         $parameter = new Parameter($this->name, $this->default);
-        return new CallbackComponent($parameter, $this->key, $this->callback);
+        return new ComponentAdapter($parameter, $this->key, $this->callback);
     }
 }

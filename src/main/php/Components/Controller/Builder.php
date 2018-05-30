@@ -67,7 +67,7 @@ class Builder
         return $this;
     }
 
-    public function build() : CallbackComponent
+    public function build() : ComponentAdapter
     {
         $controller = new Controller(
             $this->operationId,
@@ -76,7 +76,7 @@ class Builder
             $this->params
         );
 
-        return new CallbackComponent($controller, $this->key, $this->callback);
+        return new ComponentAdapter($controller, $this->key, $this->callback);
     }
 
 }

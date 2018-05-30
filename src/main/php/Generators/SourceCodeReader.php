@@ -72,7 +72,7 @@ class SourceCodeReader
                 })
         );
 
-        $components = Components\Components\Builder::instance();
+        $components = Components\AnnotationsBuilder::instance();
         $callbacks = new BuilderCallbacks($components);
 
         $handler = new Handler();

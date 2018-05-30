@@ -4,7 +4,7 @@ use Motorphp\SilexTools\Components\Component;
 use Motorphp\SilexTools\Components\ComponentsVisitor;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
 
-class Provider implements Component
+class Provider
 {
     /** @var \ReflectionClass */
     private $reflector;
@@ -21,10 +21,5 @@ class Provider implements Component
     public function writeClass(SourceCodeWriter $writer)
     {
         $writer->writeClassType($this->reflector);
-    }
-
-    function acceptVisit(ComponentsVisitor $from)
-    {
-        $from->visitProvider($this);
     }
 }

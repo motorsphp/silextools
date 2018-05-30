@@ -43,10 +43,10 @@ class Builder
         return $this;
     }
 
-    public function build() : CallbackComponent
+    public function build() : ComponentAdapter
     {
         $component =  new Converter($this->name, $this->operation);
-        return new CallbackComponent($component, $this->key, $this->callback);
+        return new ComponentAdapter($component, $this->key, $this->callback);
     }
 
 }

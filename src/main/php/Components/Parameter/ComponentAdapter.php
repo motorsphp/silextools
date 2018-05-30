@@ -1,15 +1,15 @@
-<?php namespace Motorphp\SilexTools\Components\Controller;
+<?php namespace Motorphp\SilexTools\Components\Parameter;
 
 use Motorphp\SilexTools\Components\ServiceCallback;
 use Motorphp\SilexTools\Components\Component;
 use Motorphp\SilexTools\Components\ComponentsVisitor;
-use Motorphp\SilexTools\Components\Controller;
 use Motorphp\SilexTools\Components\Key;
+use Motorphp\SilexTools\Components\Parameter;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
 
-class CallbackComponent implements Component, ServiceCallback
+class ComponentAdapter implements Component, ServiceCallback
 {
-    /** @var Controller */
+    /** @var Parameter */
     private $component;
 
     /** @var Key */
@@ -18,11 +18,22 @@ class CallbackComponent implements Component, ServiceCallback
     /** @var \ReflectionMethod */
     private $method;
 
-    public function __construct(Controller $component, Key $key, \ReflectionMethod $method)
+    /**
+     * CallbackComponent constructor.
+     * @param Parameter $component
+     * @param Key $key
+     * @param \ReflectionMethod $method
+     */
+    public function __construct(Parameter $component, Key $key, \ReflectionMethod $method)
     {
         $this->component = $component;
         $this->key = $key;
         $this->method = $method;
+    }
+
+    function acceptVisit(ComponentsVisitor $from)
+    {
+        $from->visitParameter($this, $this->component);
     }
 
     function writeKey(SourceCodeWriter $writer)
@@ -33,10 +44,5 @@ class CallbackComponent implements Component, ServiceCallback
     function writeMethod(SourceCodeWriter $writer)
     {
         $writer->writeString($this->method->name);
-    }
-
-    function acceptVisit(ComponentsVisitor $from)
-    {
-        $from->visitController($this, $this->component);
     }
 }

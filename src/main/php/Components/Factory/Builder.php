@@ -1,5 +1,6 @@
 <?php namespace Motorphp\SilexTools\Components\Factory;
 
+use Motorphp\SilexTools\Components\Component;
 use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\Components\Key;
 
@@ -18,8 +19,9 @@ class Builder
         return $this;
     }
 
-    public function build() : Factory
+    public function build() : Component
     {
-        return new Factory($this->key, $this->callback);
+        $factory = new Factory($this->key, $this->callback);
+        return new ComponentAdapter($factory);
     }
 }

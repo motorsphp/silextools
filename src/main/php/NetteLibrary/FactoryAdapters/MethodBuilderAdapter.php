@@ -3,7 +3,6 @@
 use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
 use Motorphp\SilexTools\Bootstrap\MethodBuilder;
 use Motorphp\SilexTools\Components\Components;
-use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\NetteLibrary\BootstrapBuilderAdapter;
 use Motorphp\SilexTools\NetteLibrary\Method\AbstractBuilder;
 

@@ -5,14 +5,14 @@ use Motorphp\SilexTools\Components;
 
 class BuilderCallbacks
 {
-    /** @var Components\Components\Builder */
+    /** @var Components\AnnotationsBuilder */
     private $builder;
 
     /**
      * CallbackBuilder constructor.
-     * @param Components\Components\Builder $builder
+     * @param Components\AnnotationsBuilder $builder
      */
-    public function __construct(Components\Components\Builder $builder)
+    public function __construct(Components\AnnotationsBuilder $builder)
     {
         $this->builder = $builder;
     }

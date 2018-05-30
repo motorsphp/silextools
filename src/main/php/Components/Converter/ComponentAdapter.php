@@ -7,7 +7,7 @@ use Motorphp\SilexTools\Components\Converter;
 use Motorphp\SilexTools\Components\Key;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
 
-class CallbackComponent implements Component, ServiceCallback
+class ComponentAdapter implements Component, ServiceCallback
 {
     /** @var Converter */
     private $component;

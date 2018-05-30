@@ -2,7 +2,7 @@
 
 use Motorphp\SilexTools\Components\Component;
 
-class Factory implements Component
+class Factory
 {
     /**
      * @var Key
@@ -29,10 +29,4 @@ class Factory implements Component
     {
         $writer->writeStaticInvocation($this->reflection);
     }
-
-    function acceptVisit(ComponentsVisitor $from)
-    {
-        $from->visitFactory($this);
-    }
-
 }
