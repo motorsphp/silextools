@@ -1,81 +1,62 @@
 <?php namespace Motorphp\SilexTools\Generators;
 
-use Motorphp\SilexAnnotations\Common\ContainerKey;
-use Motorphp\SilexAnnotations\Common\ControllerFactory;
-use Motorphp\SilexAnnotations\Common\ParamConverter;
-use Motorphp\SilexAnnotations\Common\ServiceFactory;
 use Motorphp\SilexAnnotations\Reader\ConstantsReader;
-use Motorphp\SilexTools\Bootstrap\Builders;
-use Motorphp\SilexTools\ClassPattern\Constants;
-use Motorphp\SilexTools\ClassPattern\PatternBuilder;
-use Motorphp\SilexTools\ClassScanner\Scanner;
-use Motorphp\SilexTools\Matcher\Matches;
-use Motorphp\SilexTools\Matcher\SelectorBuilder;
-use Pimple\ServiceProviderInterface;
-use Swagger\Annotations\Delete;
-use Swagger\Annotations\Get;
-use Swagger\Annotations\Post;
-use Swagger\Annotations\Put;
+use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
+use Motorphp\SilexTools\Bootstrap\Signatures;
+use Motorphp\SilexTools\NetteLibrary\BootstrapBuilderAdapter;
+use Motorphp\SilexTools\Components;
+use Motorphp\SilexTools\Bootstrap\Factories;
+use Motorphp\SilexTools\Bootstrap\Routes;
+use Motorphp\SilexTools\Bootstrap\Providers;
 
 class Generators
 {
+    public static function parameters(Components\Components $components) : string
+    {
+        $string = '';
+        foreach ($components->getParameters() as $parameter) {
+
+            $string .= sprintf("%s=%s", $parameter->getName(), $parameter->getDefault());
+            $string .= "\n";
+        }
+
+        return $string;
+    }
+
     /**
-     * @param array|string[] $sources list of directories to scan
-     * @param string $class prototype for the bootstrap class
+     * @param array|Components\Component[] $components
+     * @param string $class
      * @return string
      * @throws \ReflectionException
      */
-    public static function default(array $sources, string $class) : string
+    public static function bootstrap(Components\Components $components, string $class) : string
     {
-        /**
-         * @param PatternBuilder $builder
-         * @return mixed
-         * @return PatternBuilder
-         * @throws \ReflectionException
-         */
-        $patternBuilder = function (PatternBuilder $builder) {
-            return $builder->setName(ContainerKey::class)
-                ->constantPattern(ContainerKey::class)
-                    ->annotation(ContainerKey::class)->visibility(Constants::VISIBILITY_ANY)
-                ->andMethod(ServiceFactory::class)
-                    ->annotation(ServiceFactory::class, true)->modifiers(Constants::MODIFIER_STATIC)
-                ->andMethod('controller')
-                    ->anyAnnotation(Get::class, Post::class, Put::class, Delete::class)
-                ->andClass(ServiceProviderInterface::class)
-                    ->implements(ServiceProviderInterface::class)
-                ->andMethod(ControllerFactory::class)
-                    ->annotation(ControllerFactory::class)
-                ->andMethod(ParamConverter::class)
-                    ->annotation(ParamConverter::class)
-                ->expression()
-                ;
-        };
+        $signatures = new Signatures();
 
-        $reader = ConstantsReader::instance();
-
-        $matches = Matches::scanAndSelect($sources, new Scanner(), SelectorBuilder::instance($reader)->addAndBuild($patternBuilder));
-        $contents = Builders::configureFactories($class, $reader)
-            ->addAllServiceFactories(
-                $matches->getMethods(ServiceFactory::class)
-            )
-            ->addAllFactoryKeys(
-                $matches->getConstants(ContainerKey::class)
-            )
-            ->configureProviders($class)
-            ->addAllProviders(
-                $matches->getClasses(ServiceProviderInterface::class)
-            )
-            ->configureHttp($class)
-            ->addAllControllers(
-                $matches->getMethods('controller')
-            )
-            ->addAllConverters(
-                $matches->getMethods(ParamConverter::class)
-            )
-            ->buildClass()->sameAs($class)
+        $builder = new BootstrapBuilderAdapter();
+        return $builder
+            ->withClassname($class)
+            ->withSameNamespaceAsClass($class)
+            ->withProviders($signatures->configureProviders($class))
+                ->withComponents($components)
+                ->done()
+            ->withRoutes($signatures->configureHttp($class))
+                ->withComponents($components)
+                ->done()
+            ->withFactories($signatures->configureFactories($class))
+                ->withComponents($components)
+                ->done()
             ->build()
         ;
+    }
 
-        return $contents;
+    /**
+     * @param array|string[] $sources
+     * @return Components\Components
+     */
+    public static function components(array $sources) : Components\Components
+    {
+        $reader = new SourceCodeReader(ConstantsReader::instance());
+        return $reader->scan($sources);
     }
 }

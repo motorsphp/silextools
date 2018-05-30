@@ -26,7 +26,8 @@ class MatchResults implements Matches
         $mapper = function(MatchEntry $entry) {
             return $entry->param;
         };
-        return $this->mapEntries($matchKey, $mapper);
+        $entries = $this->mapEntries($matchKey, $mapper);
+        return array_unique($entries);
     }
 
     /**
@@ -38,7 +39,8 @@ class MatchResults implements Matches
         $mapper = function(MatchEntry $entry) {
             return $entry->constant;
         };
-        return $this->mapEntries($matchKey, $mapper);
+        $entries = $this->mapEntries($matchKey, $mapper);
+        return array_unique($entries);
     }
 
     /**
@@ -50,7 +52,8 @@ class MatchResults implements Matches
         $mapper = function(MatchEntry $entry) {
             return $entry->method;
         };
-        return $this->mapEntries($matchKey, $mapper);
+        $entries = $this->mapEntries($matchKey, $mapper);
+        return array_unique($entries);
     }
 
     /**
@@ -62,7 +65,8 @@ class MatchResults implements Matches
         $mapper = function(MatchEntry $entry) {
             return $entry->class;
         };
-        return $this->mapEntries($matchKey, $mapper);
+        $entries = $this->mapEntries($matchKey, $mapper);
+        return array_unique($entries);
     }
 
     private function mapEntries(string $matchKey, \Closure $mapper) : array
