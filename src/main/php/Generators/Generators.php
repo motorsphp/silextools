@@ -8,19 +8,16 @@ use Motorphp\SilexTools\Components;
 use Motorphp\SilexTools\Bootstrap\Factories;
 use Motorphp\SilexTools\Bootstrap\Routes;
 use Motorphp\SilexTools\Bootstrap\Providers;
+use Motorphp\SilexTools\ParametersFile\ParametersFileWriter;
 
 class Generators
 {
     public static function parameters(Components\Components $components) : string
     {
-        $string = '';
-        foreach ($components->getParameters() as $parameter) {
+        $writer = new ParametersFileWriter();
+        $components->visit($writer);
 
-            $string .= sprintf("%s=%s", $parameter->getName(), $parameter->getDefault());
-            $string .= "\n";
-        }
-
-        return $string;
+        return $writer->done();
     }
 
     /**

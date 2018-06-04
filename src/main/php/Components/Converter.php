@@ -19,9 +19,9 @@ class Converter
         $this->operation = $operation;
     }
 
-    function writeName(SourceCodeWriter $writer)
+    function writeName(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->name);
+        return $writer->writeString($this->name);
     }
 
     function getOperationId() : string

@@ -14,13 +14,13 @@ class Parameter
         $this->default = $default;
     }
 
-    public function writeName(SourceCodeWriter $writer)
+    public function writeName(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->name);
+        return $writer->writeString($this->name);
     }
 
-    public function writeValue(SourceCodeWriter $writer)
+    public function writeValue(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->default);
+        return $writer->writeString($this->default);
     }
 }

@@ -1,9 +1,9 @@
 <?php namespace Motorphp\SilexTools\Components\Key;
 
-use Motorphp\SilexTools\Components\ComponentsVisitor;
 use Motorphp\SilexTools\Components\Key;
 use Motorphp\SilexTools\Components\ReflectorVisitor;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
+use Motorphp\SilexTools\Components\Value;
 
 /**
  * A service key which is a defined as a class constant or a class name
@@ -27,9 +27,9 @@ class ClassnameKey implements Key
         return $this->id;
     }
 
-    function write(SourceCodeWriter $writer)
+    function write(SourceCodeWriter $writer) : Value
     {
-        $writer->writeClassName($this->reflector);
+        return $writer->writeClassName($this->reflector);
     }
 
 }

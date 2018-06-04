@@ -1,8 +1,8 @@
 <?php namespace Motorphp\SilexTools\Components\Key;
 
-use Motorphp\SilexTools\Components\ComponentsVisitor;
 use Motorphp\SilexTools\Components\Key;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
+use Motorphp\SilexTools\Components\Value;
 
 class ScalarKey implements Key
 {
@@ -19,9 +19,9 @@ class ScalarKey implements Key
         return $this->id;
     }
 
-    function write(SourceCodeWriter $writer)
+    function write(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->id);
+        return $writer->writeString($this->id);
     }
 
 }

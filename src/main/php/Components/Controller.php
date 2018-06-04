@@ -45,13 +45,13 @@ class Controller
         return $this->params;
     }
 
-    public function writeHttpMethod(SourceCodeWriter $writer)
+    public function writeHttpMethod(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->httpMethod);
+        return $writer->writeString($this->httpMethod);
     }
 
-    public function writeEndpoint(SourceCodeWriter $writer)
+    public function writeEndpoint(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->endpoint);
+        return $writer->writeString($this->endpoint);
     }
 }

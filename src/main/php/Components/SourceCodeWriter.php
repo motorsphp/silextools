@@ -2,14 +2,14 @@
 
 interface SourceCodeWriter
 {
-    public function writeString(string $value);
+    public function writeString(string $value) : Value;
 
-    public function writeClassType(\ReflectionClass $value);
+    public function writeClassType(\ReflectionClass $value) : Value;
 
-    public function writeClassName(\ReflectionClass $value);
+    public function writeClassName(\ReflectionClass $value) : Value;
 
-    public function writeConstant(\ReflectionClassConstant $value);
+    public function writeConstant(\ReflectionClassConstant $value) : Value;
 
-    public function writeStaticInvocation(\ReflectionMethod $value);
+    public function writeStaticInvocation(\ReflectionMethod $value) : Value;
 
 }

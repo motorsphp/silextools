@@ -1,6 +1,8 @@
 <?php namespace Motorphp\SilexTools\NetteLibrary\SourceCode;
 
 use Motorphp\SilexTools\Components\SourceCodeWriter;
+use Motorphp\SilexTools\Components\Value;
+use Nette\PhpGenerator\PhpLiteral;
 
 class FragmentWriter implements SourceCodeWriter
 {
@@ -20,38 +22,46 @@ class FragmentWriter implements SourceCodeWriter
         return $writer;
     }
 
-    public function writeString(string $value)
+    public function writeString(string $value) : Value
     {
         $this->params[] = $value;
-        return $this;
+        return new Value($value);
     }
 
-    public function writeClassType(\ReflectionClass $value)
+    public function writeClassType(\ReflectionClass $value) : Value
     {
-        $this->params[] = PhpLiterals::class($value);
+        $literal = $value->getShortName();
+
+        $this->params[] = new PhpLiteral($literal);
         $this->imports[] = $value->getName();
-        return $this;
+        return new Value($literal);
     }
 
-    public function writeClassName(\ReflectionClass $value)
+    public function writeClassName(\ReflectionClass $value) : Value
     {
-        $this->params[] = PhpLiterals::className($value);
+        $literal = $value->getShortName() . '::' . 'class';
+        $this->params[] = new PhpLiteral($literal);
         $this->imports[] = $value->getName();
-        return $this;
+        return new Value($literal);
     }
 
-    public function writeConstant(\ReflectionClassConstant $value)
+    public function writeConstant(\ReflectionClassConstant $value) : Value
     {
-        $this->params[] = PhpLiterals::constant($value);
+        $literal = $value->getDeclaringClass()->getShortName() . '::' . $value->getName();
+
+        $this->params[] = new PhpLiteral($literal);
         $this->imports[] = $value->getDeclaringClass()->getName();
 
-        return $this;
+        return new Value($literal);
     }
 
-    public function writeStaticInvocation(\ReflectionMethod $value)
+    public function writeStaticInvocation(\ReflectionMethod $value) : Value
     {
-        $this->params[] = PhpLiterals::staticMethod($value);
+        $literal = $value->getDeclaringClass()->getShortName() . '::' . $value->getName();
+        $this->params[] = new PhpLiteral($literal);
         $this->imports[] = $value->getDeclaringClass()->getName();
+
+        return new Value($literal);
     }
 
     public function writeTemplate(string $template)

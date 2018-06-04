@@ -31,8 +31,8 @@ class Provider
         return $this->key;
     }
 
-    public function writeClass(SourceCodeWriter $writer)
+    public function writeClass(SourceCodeWriter $writer) : Value
     {
-        $writer->writeClassType($this->reflector);
+        return $writer->writeClassType($this->reflector);
     }
 }
