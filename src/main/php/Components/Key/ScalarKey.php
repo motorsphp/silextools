@@ -14,7 +14,7 @@ class ScalarKey implements Key
         $this->id = $id;
     }
 
-    function getId()
+    function getId() : string
     {
         return $this->id;
     }

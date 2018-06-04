@@ -4,7 +4,7 @@ use Motorphp\SilexTools\Components\ComponentsVisitorAbstract;
 use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\Components\Provider;
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
-use Motorphp\SilexTools\NetteLibrary\Method\MethodBodyPartWriter;
+use Motorphp\SilexTools\NetteLibrary\SourceCode\FragmentWriter;
 
 class MethodBodyWriter extends ComponentsVisitorAbstract
 {
@@ -31,7 +31,11 @@ EOT
 
     function visitFactory(Factory $component)
     {
-        $writer = MethodBodyPartWriter::fromTemplate(MethodBodyWriter::$template);
+        if (! $component->getPlacement()->isStandalone()) {
+            return;
+        }
+
+        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$template);
         $component->writeKey($writer);
         if ($this->containerClass) {
             $writer->writeClassType($this->containerClass);
@@ -40,7 +44,7 @@ EOT
         }
         $component->writeCallback($writer);
 
-        $this->bodyParts[] = $writer->build();
+        $this->bodyParts[] = $writer->done();
     }
 
     function getMethodBody() : MethodBody

@@ -1,32 +1,15 @@
 <?php namespace Motorphp\SilexTools\Components;
 
-use Motorphp\SilexTools\Components\Component;
+use Motorphp\SilexTools\Components\Factory\Capabilities;
+use Motorphp\SilexTools\Components\Factory\Placement;
 
-class Factory
+interface Factory
 {
-    /**
-     * @var Key
-     */
-    private $key;
+    function writeKey(SourceCodeWriter $writer);
 
-    /**
-     * @var \ReflectionMethod
-     */
-    private $reflection;
+    function writeCallback(SourceCodeWriter $writer);
 
-    public function __construct(Key $key, \ReflectionMethod $reflection)
-    {
-        $this->key = $key;
-        $this->reflection = $reflection;
-    }
+    public function getPlacement(): Placement;
 
-    function writeKey(SourceCodeWriter $writer)
-    {
-        $this->key->write($writer);
-    }
-
-    function writeCallback(SourceCodeWriter $writer)
-    {
-        $writer->writeStaticInvocation($this->reflection);
-    }
+    public function getCapabilities(): Capabilities;
 }

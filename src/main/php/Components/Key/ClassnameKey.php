@@ -22,7 +22,7 @@ class ClassnameKey implements Key
         $this->reflector = $reflector;
     }
 
-    function getId()
+    function getId() : string
     {
         return $this->id;
     }

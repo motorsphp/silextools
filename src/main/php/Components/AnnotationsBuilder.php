@@ -1,6 +1,7 @@
 <?php namespace Motorphp\SilexTools\Components;
 
 use Motorphp\SilexAnnotations\Common;
+use Motorphp\SilexAnnotations\Common\Service;
 use Motorphp\SilexAnnotations\Reader\ConstantsReader;
 use Motorphp\SilexTools\Components\Annotations;
 
@@ -98,14 +99,30 @@ class AnnotationsBuilder
     {
         /** @var Common\ServiceFactory $annotation */
         $annotation = $reader->getMethodAnnotation($reflector, Common\ServiceFactory::class);
+        /** @var Common\FactoryCapabilities $capabilities */
+        $capabilities = $reader->getMethodAnnotation($reflector, Common\FactoryCapabilities::class);
+
         $processor = new Annotations\FactoryProcessor();
-        $this->factories[] = $processor->binding($annotation, $reflector);
+        $this->factories[] = $processor->binding($annotation, $capabilities, $reflector);
         return $this;
     }
 
     public function addProvider(\ReflectionClass $reflector, ConstantsReader $reader) : AnnotationsBuilder
     {
-        $this->providers[] = new Provider\ComponentAdapter(new Provider($reflector));
+        /** @var Key $key */
+        $key = null;
+
+        /** @var Service $service */
+        $service = $reader->getClassAnnotation($reflector, Service::class);
+        if ($service && $service->name) {
+            $key = new Key\ScalarKey($service->name);
+        }
+        if (empty($key)) {
+            $key = new Key\ClassnameKey($reflector->getName(), $reflector);
+        }
+
+        $provider = new Provider($key, $reflector);
+        $this->providers[] = new Provider\ComponentAdapter($provider);
         return $this;
     }
 

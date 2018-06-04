@@ -2,6 +2,7 @@
 
 use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
 use Motorphp\SilexTools\NetteLibrary\BootstrapBuilderAdapter;
+use Motorphp\SilexTools\NetteLibrary\SourceCode\Fragment;
 use Nette\PhpGenerator\Factory;
 use Nette\PhpGenerator\Method;
 
@@ -13,7 +14,7 @@ abstract class AbstractBuilder
     /** @var MethodBody */
     private $body;
 
-    /** @var array | MethodBodyPart[] */
+    /** @var array | Fragment[] */
     private $bodyParts = [];
 
     public function withSignature(\ReflectionMethod $signature) : AbstractBuilder
@@ -31,7 +32,7 @@ abstract class AbstractBuilder
     }
 
     /**
-     * @param array | MethodBodyPart[] $parts
+     * @param array | Fragment[] $parts
      * @return AbstractBuilder
      */
     function withBodyParts(array $parts) : AbstractBuilder

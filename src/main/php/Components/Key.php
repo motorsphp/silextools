@@ -2,7 +2,7 @@
 
 interface Key
 {
-    function getId();
+    function getId() : string;
 
     function write(SourceCodeWriter $writer);
 }

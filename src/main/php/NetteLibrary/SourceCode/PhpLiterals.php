@@ -1,4 +1,4 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary;
+<?php namespace Motorphp\SilexTools\NetteLibrary\SourceCode;
 
 use Nette\PhpGenerator\PhpLiteral;
 

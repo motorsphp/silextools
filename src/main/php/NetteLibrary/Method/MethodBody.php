@@ -1,17 +1,18 @@
 <?php namespace Motorphp\SilexTools\NetteLibrary\Method;
 
+use Motorphp\SilexTools\NetteLibrary\SourceCode\Fragment;
 use Nette\PhpGenerator\Method;
 
 class MethodBody
 {
     /**
-     * @var MethodBodyPart
+     * @var Fragment
      */
     private $parts;
 
     /**
      * MethodBody constructor.
-     * @param array|MethodBodyPart[] $parts
+     * @param array|Fragment[] $parts
      */
     public function __construct(array $parts)
     {
@@ -23,7 +24,7 @@ class MethodBody
      */
     public function getImports() : array
     {
-        $reducer = function (array $imports, MethodBodyPart $part) {
+        $reducer = function (array $imports, Fragment $part) {
             return array_merge($imports, $part->getImports());
         };
 

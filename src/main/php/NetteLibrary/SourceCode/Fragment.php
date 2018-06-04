@@ -1,8 +1,6 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary\Method;
+<?php namespace Motorphp\SilexTools\NetteLibrary\SourceCode;
 
-use Nette\PhpGenerator\Method;
-
-class MethodBodyPart
+class Fragment
 {
     /**
      * @var string
@@ -20,12 +18,12 @@ class MethodBodyPart
     private $imports;
 
     /**
-     * MethodBodyPart constructor.
+     * Fragment constructor.
      * @param string $body
      * @param array $args
      * @param array|\ReflectionClass[] $imports
      */
-    public function __construct(string $body, array $args, array $imports)
+    public function __construct(string $body, array $args, $imports)
     {
         $this->body = $body;
         $this->args = $args;
@@ -56,20 +54,13 @@ class MethodBodyPart
         return $this->imports;
     }
 
-    public function merge(MethodBodyPart $other): MethodBodyPart
+    public function append(Fragment $other) : Fragment
     {
         $body = $this->body . $other->getBody();
         $args = array_merge($this->args, $other->getArgs());
         $imports = array_merge($this->imports, $other->getImports());
 
 
-        return new MethodBodyPart($body, $args, $imports);
+        return new Fragment($body, $args, $imports);
     }
-
-    public function configure(Method $method)
-    {
-        $method->setBody($this->body, $this->args);
-    }
-
-
 }

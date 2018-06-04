@@ -8,17 +8,36 @@ use Motorphp\SilexTools\Components\ServiceCallback;
 
 class FactoryProcessor
 {
-    public function binding(Common\ServiceFactory $annotation, \ReflectionMethod $reflector) : ServiceCallback\Binding
+    public function binding(
+        Common\ServiceFactory $annotation,
+        Common\FactoryCapabilities $capabilities = null,
+        \ReflectionMethod $reflector
+    ) : ServiceCallback\Binding
     {
+        $callback = null;
         if ($annotation->service) {
-            return new ServiceCallback\BindingScalarKey($annotation->service, $reflector);
+            $callback = new ServiceCallback\BindingScalarKey($annotation->service, $reflector);
+        } else {
+            $callback = ServiceCallback\Bindings::returnType($reflector);
         }
 
-        return ServiceCallback\Bindings::returnType($reflector);
+        $capabilitiesMap = [] ;
+        if (! empty($capabilities)) {
+            $capabilitiesMap['firewall'] = $capabilities->firewall;
+        }
+
+        $provider = null;
+        if (empty($annotation->provider)) {
+            $provider = '';
+        } else {
+            $provider = $annotation->provider;
+        }
+
+        return new Factory\Binding($callback, $provider, $capabilitiesMap);
     }
 
     /**
-     * @param array | ServiceCallback\Binding[] $bindings
+     * @param array | Factory\Binding[] $bindings
      * @param KeyFactories $keysBuilder
      * @return array|Component[]
      */
@@ -27,10 +46,13 @@ class FactoryProcessor
         $components = [];
         foreach ($bindings as $binding) {
             $builder = new Factory\Builder();
-            $components[] = $builder->withCallback(
-                $binding->resolveKey($keysBuilder),
-                $binding->getMethod()
-            )->build();
+            $binding->configureBuilder($builder);
+
+            $components[] = $builder
+                ->withCallback(
+                    $binding->resolveKey($keysBuilder),
+                    $binding->getMethod()
+                )->build();
         }
 
         return $components;

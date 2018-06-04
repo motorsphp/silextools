@@ -3,12 +3,11 @@
 use Motorphp\SilexTools\Components\ComponentsVisitorAbstract;
 use Motorphp\SilexTools\Components\Controller;
 use Motorphp\SilexTools\Components\Converter;
-use Motorphp\SilexTools\Components\Provider;
 use Motorphp\SilexTools\Components\ServiceCallback;
 
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
-use Motorphp\SilexTools\NetteLibrary\Method\MethodBodyPart;
-use Motorphp\SilexTools\NetteLibrary\Method\MethodBodyPartWriter;
+use Motorphp\SilexTools\NetteLibrary\SourceCode\Fragment;
+use Motorphp\SilexTools\NetteLibrary\SourceCode\FragmentWriter;
 
 class MethodBodyWriter extends ComponentsVisitorAbstract
 {
@@ -26,7 +25,7 @@ EOT;
 
     function visitController(ServiceCallback $callback, Controller $service)
     {
-        $writer = MethodBodyPartWriter::fromTemplate(MethodBodyWriter::$template);
+        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$template);
 
         $service->writeHttpMethod($writer);
         $service->writeEndpoint($writer);
@@ -35,14 +34,14 @@ EOT;
         $callback->writeMethod($writer);
 
         $this->controllerParts[] = [
-            $service->getOperationId(), $writer->build()
+            $service->getOperationId(), $writer->done()
         ];
     }
 
     function visitConverter(ServiceCallback $callback, Converter $service)
     {
         /** @var $writer */
-        $writer = MethodBodyPartWriter::fromTemplate(MethodBodyWriter::$providerTemplate);
+        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$providerTemplate);
         $service->writeName($writer);
 
         $callback->writeKey($writer);
@@ -50,7 +49,7 @@ EOT;
 
         $this->providerParts[] = [
             $service->getOperationId(),
-            $writer->build()
+            $writer->done()
         ];
     }
 
@@ -68,12 +67,12 @@ EOT;
         }
 
         foreach ($groups as $list) {
-            $reducer = function (MethodBodyPart $controller, MethodBodyPart $provider) {
-                return $controller->merge($provider);
+            $reducer = function (Fragment $controller, Fragment $provider) {
+                return $controller->append($provider);
             };
             $controller = array_shift($list);
             $merged[] = array_reduce($list, $reducer, $controller);
-            $merged[] = new MethodBodyPart(';' . PHP_EOL, [], []);
+            $merged[] = new Fragment(';' . PHP_EOL, [], []);
         }
 
         return $merged;
