@@ -48,4 +48,16 @@ class Scanner
         $finder = new Finder();
         return $this->scanUseFinder($directory, $finder);
     }
+
+    /**
+     * Scans all directories and returns an iterator over all the reflection classes found
+     *
+     * @param array $directory
+     * @return ClassIterator
+     */
+    public function iterateAllClasses(array $directory): ClassIterator
+    {
+        $files = $this->scanAll($directory);
+        return new ClassIterator($files);
+    }
 }

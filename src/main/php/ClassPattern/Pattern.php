@@ -4,5 +4,5 @@ interface Pattern
 {
     function getId(): PatternId;
 
-    function configureMatcher(MatcherConfigurator $configurator);
+    function configureMatchContext(MatchContext $context);
 }

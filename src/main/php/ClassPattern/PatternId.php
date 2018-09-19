@@ -5,13 +5,12 @@ class PatternId
     private static $lastId = 0;
 
     /**
-     * @param string $matchKey
      * @return PatternId
      */
-    public static function next(string $matchKey) : PatternId
+    public static function next() : PatternId
     {
         PatternId::$lastId++;
-        return new PatternId(PatternId::$lastId, $matchKey);
+        return new PatternId(PatternId::$lastId);
     }
 
     /**
@@ -35,28 +34,17 @@ class PatternId
      */
     private $id;
 
-    /**
-     * @var string
-     */
-    private $matchKey;
-
-    public function __construct(string $id, string $matchKey)
+    public function __construct(string $id)
     {
         $this->id = $id;
-        $this->matchKey = $matchKey;
-    }
-
-    public function getMatchKey(): string
-    {
-        return $this->matchKey;
     }
 
     public function equals(PatternId $other)
     {
-        return $this->id === $other->toString() ;
+        return $this->id === $other->asString() ;
     }
 
-    public function toString()
+    public function asString() : string
     {
         return (string) $this->id;
     }

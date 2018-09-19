@@ -1,7 +1,7 @@
 <?php namespace Motorphp\SilexTools\Matcher;
 
 use Motorphp\SilexAnnotations\Common\ContainerKey;
-use Motorphp\SilexTools\ClassPattern\PatternBuilder;
+use Motorphp\SilexTools\ClassPattern\PatternGroupBuilder;
 use Motorphp\SilexTools\ClassScanner\ClassFile;
 use Motorphp\SilexTools\ClassScanner\Scanner;
 use PHPUnit\Framework\TestCase;
@@ -30,17 +30,17 @@ class FilterMatcherTest  extends TestCase
 
 
         $matcher = FilterBuilder::any(
-            function (PatternBuilder $builder) {
+            function (PatternGroupBuilder $builder) {
                 return $builder->setName(ContainerKey::class)
-                    ->constantPattern(ContainerKey::class)->annotation(ContainerKey::class)
+                    ->constantPattern()->annotation(ContainerKey::class)
                     ->expression()
                     ;
             }
         )
             ->add(
-                function (PatternBuilder $builder) {
+                function (PatternGroupBuilder $builder) {
                     return $builder->setName(Get::class)
-                        ->methodPattern(Get::class)->annotation(Get::class, true)
+                        ->methodPattern()->annotation(Get::class, true)
                         ->expression()
                         ;
                 }

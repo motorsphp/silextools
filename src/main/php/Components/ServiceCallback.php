@@ -5,7 +5,7 @@
  */
 interface ServiceCallback
 {
-    function writeKey(SourceCodeWriter $writer);
+    function writeKey(SourceCodeWriter $writer) : Value;
 
-    function writeMethod(SourceCodeWriter $writer);
+    function writeMethod(SourceCodeWriter $writer) : Value;
 }

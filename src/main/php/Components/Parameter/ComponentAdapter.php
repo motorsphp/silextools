@@ -6,6 +6,7 @@ use Motorphp\SilexTools\Components\ComponentsVisitor;
 use Motorphp\SilexTools\Components\Key;
 use Motorphp\SilexTools\Components\Parameter;
 use Motorphp\SilexTools\Components\SourceCodeWriter;
+use Motorphp\SilexTools\Components\Value;
 
 class ComponentAdapter implements Component, ServiceCallback
 {
@@ -36,13 +37,13 @@ class ComponentAdapter implements Component, ServiceCallback
         $from->visitParameter($this, $this->component);
     }
 
-    function writeKey(SourceCodeWriter $writer)
+    function writeKey(SourceCodeWriter $writer) : Value
     {
-        $this->key->write($writer);
+        return $this->key->write($writer);
     }
 
-    function writeMethod(SourceCodeWriter $writer)
+    function writeMethod(SourceCodeWriter $writer) : Value
     {
-        $writer->writeString($this->method->name);
+        return $writer->writeString($this->method->name);
     }
 }

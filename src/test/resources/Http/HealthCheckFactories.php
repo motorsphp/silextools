@@ -23,19 +23,7 @@ class HealthCheckFactories
      */
     public static function factory(Container $app) : HealthCheckFactories
     {
-        /** @var Serializer $serializer */
-        $serializer = $app[Serializer::class];
-        return new HealthCheckFactories($serializer);
-    }
-
-    /**
-     * @var Serializer
-     */
-    private $serializer;
-
-    public function __construct(Serializer $serializer)
-    {
-        $this->serializer = $serializer;
+        return new HealthCheckFactories();
     }
 
     /**
@@ -51,6 +39,6 @@ class HealthCheckFactories
 
     public function view(HealthCheck $healthCheck, Request $request): string
     {
-        return $this->serializer->serialize($healthCheck, 'json');
+        return "";
     }
 }
