@@ -13,6 +13,7 @@
         "nette/php-generator": "^3.1",
         "phramz/doctrine-annotation-scanner": "^1.0",
         "motorphp/silexannotations": "dev-develop",
+        "motorphp/phpscan": "dev-master",
         "zircote/swagger-php": "^2.0",
         "silex/silex": "^2.2"
     },
@@ -37,6 +38,10 @@
         "motorphp/silexannotations": {
             "type": "path",
             "url": "../silexannotations"
+        },
+        "motorphp/phpscan": {
+            "type": "path",
+            "url": "../phpscan"
         }
     },
 

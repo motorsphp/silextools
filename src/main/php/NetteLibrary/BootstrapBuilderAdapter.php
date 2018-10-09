@@ -1,12 +1,15 @@
 <?php namespace Motorphp\SilexTools\NetteLibrary;
 
+use Motorphp\SilexAnnotations\Reader\ConstantsReader;
+use Motorphp\SilexTools\Annotations\ComponentsScanner;
 use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
-use Motorphp\SilexTools\Bootstrap\MethodBuilder;
-use Motorphp\SilexTools\NetteLibrary\FactoryAdapters;
+use Motorphp\SilexTools\Components\Components;
+use Motorphp\SilexTools\Components\ComponentsVisitorGroup;
+use Motorphp\SilexTools\NetteLibrary\Method\BodyWriter;
+use Motorphp\SilexTools\NetteLibrary\Method\Configuration;
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Factory;
-use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpNamespace;
 
 class BootstrapBuilderAdapter implements BootstrapBuilder
@@ -17,11 +20,17 @@ class BootstrapBuilderAdapter implements BootstrapBuilder
     /** @var string */
     private $namespace;
 
-    /** @var $array|Method[] */
+    /** @var $array|Configuration[] */
     private $methods = [];
 
     /** @var $array|string[] */
     private $imports = [];
+
+    /** @var Components */
+    private $components;
+
+    /** @var array|string[] */
+    private $folders;
 
     /**
      * @param string $class
@@ -53,61 +62,82 @@ class BootstrapBuilderAdapter implements BootstrapBuilder
         return $this;
     }
 
-    public function withMethodBody(MethodBody $body, \ReflectionMethod $signature) : BootstrapBuilder
+    public function withComponents(Components $components) : BootstrapBuilder
     {
-        $method = (new Factory)->fromMethodReflection($signature);
-        $body->configure($method);
-        $this->withMethod($method);
-
-        $imports = $body->getImports();
-        $this->imports = array_merge($this->imports, $imports);
-
+        $this->components = $components;
+        $this->folders = null;
         return $this;
     }
 
-    public function withMethod(Method $method)
+    /**
+     * @param string|string[] $folders
+     * @return BootstrapBuilder
+     */
+    public function withComponentsFrom($folders): BootstrapBuilder
     {
-        $this->methods[] = $method;
+        if (is_string($folders)) {
+            $this->folders = [ $folders ];
+        } else if (is_array($folders)){
+            $this->folders = $folders;
+        } else {
+            throw new \InvalidArgumentException('expecting either a path to a folder or a list of folders');
+        }
+
+        $this->components = null;
         return $this;
     }
 
-    public function withRoutes(\ReflectionMethod $signature) : MethodBuilder
+    public function withMethod(BodyWriter $writer, \ReflectionMethod $signature)  : BootstrapBuilder
     {
-        $builder = new RouteAdapters\MethodBuilderAdapter($this);
-        $builder->withSignature($signature);
+        $configuration = new Configuration();
+        $configuration->setWriter($writer);
+        $configuration->setSignature($signature);
 
-        return $builder;
-    }
-
-    public function withProviders(\ReflectionMethod $signature): MethodBuilder
-    {
-        $builder = new ProviderAdapters\MethodBuilderAdapter($this);
-        $builder->withSignature($signature);
-
-        return $builder;
-    }
-
-    public function withFactories(\ReflectionMethod $signature): MethodBuilder
-    {
-        $builder = new FactoryAdapters\MethodBuilderAdapter($this);
-        $builder->withSignature($signature);
-
-        return $builder;
+        $this->methods[] = $configuration;
+        return $this;
     }
 
     public function build() : string
     {
-        $namespace = new PhpNamespace($this->namespace);
-        $imports = array_unique($this->imports);
+        if (! empty($this->folders)) {
+            $components =  ComponentsScanner::createDefault(ConstantsReader::instance())->scan($this->folders);
+        } else {
+            $components = &$this->components;
+        }
 
+        $writers = array_map(function (Configuration $configuration) {
+            return $configuration->getWriter();
+        }, $this->methods);
+        $visitor = new ComponentsVisitorGroup($writers);
+        $components->visit($visitor);
+
+        $imports = array_merge([], $this->imports);
+        $methods = [];
+        foreach ($this->methods as $configuration) {
+
+            $writer = $configuration->getWriter();
+            $signature = $configuration->getSignature();
+
+            $method = (new Factory)->fromMethodReflection($signature);
+            $methods[] = $method;
+            /** @var MethodBody $body */
+            $body = $writer->getMethodBody();
+            $body->configure($method);
+
+            $imports = array_merge($imports, $body->getImports());
+        }
+
+        $imports = array_unique($imports);
+        $namespace = new PhpNamespace($this->namespace);
         foreach ($imports as $import) {
             $namespace->addUse($import);
         }
 
         $class = new ClassType($this->name, $namespace);
-        $class->setMethods($this->methods);
+        $class->setMethods($methods);
 
         return '<?php ' . (string) $namespace . (string) $class;
     }
+
 
 }

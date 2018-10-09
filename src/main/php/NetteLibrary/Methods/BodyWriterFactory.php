@@ -1,12 +1,13 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary\FactoryAdapters;
+<?php namespace Motorphp\SilexTools\NetteLibrary\Methods;
 
 use Motorphp\SilexTools\Components\ComponentsVisitorAbstract;
 use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\Components\Provider;
+use Motorphp\SilexTools\NetteLibrary\Method\BodyWriter;
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
 use Motorphp\SilexTools\NetteLibrary\SourceCode\FragmentWriter;
 
-class MethodBodyWriter extends ComponentsVisitorAbstract
+class BodyWriterFactory extends ComponentsVisitorAbstract implements BodyWriter
 {
     private static $template = <<<'EOT'
 $container->offsetSet(?, function (? $container) {
@@ -19,6 +20,28 @@ EOT
 
     /** @var \ReflectionClass */
     private $containerClass;
+
+    /**
+     * @param \ReflectionMethod $signature
+     * @return BodyWriterFactory
+     * @throws \ReflectionException
+     */
+    public static function fromSignature(\ReflectionMethod $signature) : BodyWriterFactory
+    {
+        $containerType = null;
+        foreach ($signature->getParameters() as $parameter) {
+            if ($parameter->getName() === 'container') {
+                $containerType = $parameter->getType();
+            }
+        }
+
+        if ($containerType && !$containerType->isBuiltin()) {
+            $containerType = new \ReflectionClass($containerType->getName());
+            return new BodyWriterFactory($containerType);
+        }
+
+        return new BodyWriterFactory();
+    }
 
     /**
      * MethodBodyWriter constructor.
@@ -35,7 +58,7 @@ EOT
             return;
         }
 
-        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$template);
+        $writer = FragmentWriter::fromTemplate(BodyWriterFactory::$template);
         $component->writeKey($writer);
         if ($this->containerClass) {
             $writer->writeClassType($this->containerClass);

@@ -1,8 +1,6 @@
 <?php namespace Motorphp\SilexTools\Bootstrap;
 
-use Motorphp\SilexTools\Bootstrap\Factories;
-use Motorphp\SilexTools\Bootstrap\Providers;
-use Motorphp\SilexTools\Bootstrap\Routes;
+use Motorphp\SilexTools\Components\Components;
 
 interface BootstrapBuilder
 {
@@ -22,11 +20,13 @@ interface BootstrapBuilder
      */
     public function withClassname(string $class) : BootstrapBuilder;
 
-    public function withRoutes(\ReflectionMethod $signature) : MethodBuilder;
+    public function withComponents(Components $components) : BootstrapBuilder;
 
-    public function withProviders(\ReflectionMethod $signature) : MethodBuilder;
-
-    public function withFactories(\ReflectionMethod $signature) : MethodBuilder;
+    /**
+     * @param string|string[]$folders
+     * @return BootstrapBuilder
+     */
+    public function withComponentsFrom($folders) : BootstrapBuilder;
 
     function build(): string;
 }

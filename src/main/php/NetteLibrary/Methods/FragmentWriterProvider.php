@@ -1,4 +1,4 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary\ProviderAdapters;
+<?php namespace Motorphp\SilexTools\NetteLibrary\Methods;
 
 use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\Components\Provider;

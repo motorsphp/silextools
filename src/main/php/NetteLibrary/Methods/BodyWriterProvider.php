@@ -1,12 +1,13 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary\ProviderAdapters;
+<?php namespace Motorphp\SilexTools\NetteLibrary\Methods;
 
 use Motorphp\SilexTools\Components\ComponentsVisitorAbstract;
 use Motorphp\SilexTools\Components\Factory;
 use Motorphp\SilexTools\Components\Provider;
+use Motorphp\SilexTools\NetteLibrary\Method\BodyWriter;
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
 use Motorphp\SilexTools\NetteLibrary\SourceCode\Fragment;
 
-class MethodBodyWriter extends ComponentsVisitorAbstract
+class BodyWriterProvider extends ComponentsVisitorAbstract implements BodyWriter
 {
     /** @var array | Factory[]  */
     private $factoriesOther = [];

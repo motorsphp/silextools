@@ -1,15 +1,16 @@
-<?php namespace Motorphp\SilexTools\NetteLibrary\RouteAdapters;
+<?php namespace Motorphp\SilexTools\NetteLibrary\Methods;
 
 use Motorphp\SilexTools\Components\ComponentsVisitorAbstract;
 use Motorphp\SilexTools\Components\Controller;
 use Motorphp\SilexTools\Components\Converter;
 use Motorphp\SilexTools\Components\ServiceCallback;
 
+use Motorphp\SilexTools\NetteLibrary\Method\BodyWriter;
 use Motorphp\SilexTools\NetteLibrary\Method\MethodBody;
 use Motorphp\SilexTools\NetteLibrary\SourceCode\Fragment;
 use Motorphp\SilexTools\NetteLibrary\SourceCode\FragmentWriter;
 
-class MethodBodyWriter extends ComponentsVisitorAbstract
+class BodyWriterRoute extends ComponentsVisitorAbstract implements BodyWriter
 {
     private static $template = <<<'EOT'
 $controllers->?(?, sprintf('%s:%s', ?, ?))
@@ -25,7 +26,7 @@ EOT;
 
     function visitController(ServiceCallback $callback, Controller $service)
     {
-        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$template);
+        $writer = FragmentWriter::fromTemplate(BodyWriterRoute::$template);
 
         $service->writeHttpMethod($writer);
         $service->writeEndpoint($writer);
@@ -41,7 +42,7 @@ EOT;
     function visitConverter(ServiceCallback $callback, Converter $service)
     {
         /** @var $writer */
-        $writer = FragmentWriter::fromTemplate(MethodBodyWriter::$providerTemplate);
+        $writer = FragmentWriter::fromTemplate(BodyWriterRoute::$providerTemplate);
         $service->writeName($writer);
 
         $callback->writeKey($writer);

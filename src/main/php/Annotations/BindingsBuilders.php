@@ -42,14 +42,6 @@ class BindingsBuilders
         $this->keyFactories = $keyFactories;
     }
 
-    public function addAllParameters(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addParameter($reflector, $reader);
-        }
-        return $this;
-    }
-
     public function addParameter(\ReflectionMethod $reflector, ConstantsReader $reader) : BindingsBuilders
     {
         /** @var Common\Parameter $annotation */
@@ -60,18 +52,6 @@ class BindingsBuilders
         return $this;
     }
 
-    /**
-     * @param array|\ReflectionClassConstant[] $reflectors
-     * @param ConstantsReader $reader
-     * @return BindingsBuilders
-     */
-    public function addAllKeys(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addKey($reflector, $reader);
-        }
-        return $this;
-    }
 
     public function addKey(\ReflectionClassConstant $reflector, ConstantsReader $reader) : BindingsBuilders
     {
@@ -87,14 +67,6 @@ class BindingsBuilders
         $component = new Components\Key\ConstantKey($serviceKey, $reflector);
 
         $this->keys[] = $component;
-        return $this;
-    }
-
-    public function addAllControllers(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addController($reflector, $reader);
-        }
         return $this;
     }
 
@@ -116,28 +88,12 @@ class BindingsBuilders
         return $this;
     }
 
-    public function addAllConverters(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addConverter($reflector, $reader);
-        }
-        return $this;
-    }
-
     public function addConverter(\ReflectionMethod $reflector, ConstantsReader $reader) : BindingsBuilders
     {
         /** @var Common\ParamConverter $annotation */
         $annotation = $reader->getMethodAnnotation($reflector, Common\ParamConverter::class);
         $processor = new ConverterProcessor();
         $this->converters[] = $processor->binding($annotation, $reflector);
-        return $this;
-    }
-
-    public function addAllFactories(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addFactory($reflector, $reader);
-        }
         return $this;
     }
 
@@ -150,14 +106,6 @@ class BindingsBuilders
 
         $processor = new FactoryProcessor();
         $this->factories[] = $processor->binding($annotation, $capabilities, $reflector);
-        return $this;
-    }
-
-    public function addAllProviders(array $reflectors, ConstantsReader $reader) : BindingsBuilders
-    {
-        foreach ($reflectors as $reflector) {
-            $this->addProvider($reflector, $reader);
-        }
         return $this;
     }
 
