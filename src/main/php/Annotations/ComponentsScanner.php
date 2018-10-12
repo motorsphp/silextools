@@ -35,12 +35,6 @@ class ComponentsScanner
     static public function createDefault(ConstantsReader $reader) : ComponentsScanner
     {
         $reader = new ComponentsScanner($reader);
-        $reader
-            ->factoriesDefault()
-            ->providersDefault(ServiceProviderInterface::class)
-            ->controllersDefault([Get::class, Post::class, Put::class, Delete::class])
-            ->convertersDefault()
-        ;
         return $reader;
     }
 
@@ -49,164 +43,59 @@ class ComponentsScanner
         $this->reader = $reader;
     }
 
-    private function collectProviders()
+    private function configureProviders( ConsumerBuilder $builder) : ConsumerBuilder
     {
-        return function (array $reflectors) {
-            foreach ($reflectors as $reflector) {
-                $this->components->addProvider($reflector, $this->reader);
+        return $builder->setOutput(
+            function (array $reflectors) {
+                foreach ($reflectors as $reflector) {
+                    $this->components->addProvider($reflector, $this->reader);
+                }
             }
-        };
-    }
-
-    public function providers(Query $query) : ComponentsScanner
-    {
-        $this->consumers[__FUNCTION__] = Consumers::buildWithDefaultDataModel()
-            ->setQuery($query)
-            ->setOutputNotEmpty($this->collectProviders())
-            ->build()
-        ;
-
-        return $this;
-    }
-
-    public function providersDefault($interface) : ComponentsScanner
-    {
-        return $this->providers(
-                Criteria::factory(\ReflectionClass::class, 'c')
-                    ->where(
-             //           Consumers::expr()->implements('c', ServiceProviderInterface::class)
-                            Consumers::expr()->implements('c', $interface)
-                    )
-                    ->build()
-            )
-        ;
-    }
-
-    private function collectControllers() : \Closure
-    {
-        return function (array $reflectors) {
-            foreach ($reflectors as $reflector) {
-                $this->components->addController($reflector, $this->reader);
-            }
-        };
-    }
-
-    public function controllers(Query $query) : ComponentsScanner
-    {
-        $this->consumers[__FUNCTION__] = Consumers::buildWithDefaultDataModel()
-            ->setQuery($query)
-            ->setOutputNotEmpty($this->collectControllers())
-            ->build()
-        ;
-
-        return $this;
-    }
-
-    public function controllersDefault($annotations): ComponentsScanner
-    {
-        return $this->controllers(
-            Criteria::factory(\ReflectionMethod::class, 'c')
-                ->andWhere(
-                //Consumers::expr()->hasAnyAnnotations('c', [Get::class, Post::class, Put::class, Delete::class])
-                    Consumers::expr()->hasAnyAnnotations('c', $annotations)
-                )
-                ->build()
         );
     }
 
-    private function collectFactories() : \Closure
+    private function configureControllers( ConsumerBuilder $builder) : ConsumerBuilder
     {
-        return function (array $reflectors) {
-            foreach ($reflectors as $reflector) {
-                $this->components->addFactory($reflector, $this->reader);
+        return $builder->setOutput(
+            function (array $reflectors) {
+                foreach ($reflectors as $reflector) {
+                    $this->components->addController($reflector, $this->reader);
+                }
             }
-        };
-    }
-
-    public function factories(Query $query) : ComponentsScanner
-    {
-        $this->consumers[__FUNCTION__] = Consumers::buildWithDefaultDataModel()
-            ->setQuery($query)
-            ->setOutputNotEmpty($this->collectFactories())
-            ->build()
-        ;
-
-        return $this;
-    }
-
-    public function factoriesDefault(): ComponentsScanner
-    {
-        return $this->factories(
-            Criteria::factory(\ReflectionMethod::class, 'c')
-                ->andWhere(
-                    Consumers::expr()->hasAnnotations('c', ServiceFactory::class),
-                    Consumers::expr()->hasModifiers('c', \ReflectionMethod::IS_STATIC )
-                )
-                ->build()
         );
     }
 
-    private function collectConverters() : \Closure
+    private function configureFactories( ConsumerBuilder $builder) : ConsumerBuilder
     {
-        return function (array $reflectors) {
-            foreach ($reflectors as $reflector) {
-                $this->components->addConverter($reflector, $this->reader);
+        return $builder->setOutput(
+            function (array $reflectors) {
+                foreach ($reflectors as $reflector) {
+                    $this->components->addFactory($reflector, $this->reader);
+                }
             }
-        };
-    }
-
-    public function converters(Query $query) : ComponentsScanner
-    {
-        $this->consumers[__FUNCTION__] = Consumers::buildWithDefaultDataModel()
-            ->setQuery($query)
-            ->setOutputNotEmpty($this->collectConverters())
-            ->build()
-        ;
-
-        return $this;
-    }
-
-    public function convertersDefault(): ComponentsScanner
-    {
-        return $this->converters(
-            Criteria::factory(\ReflectionMethod::class, 'c')
-                ->andWhere(
-                    Consumers::expr()->hasAnnotations('c', ParamConverter::class)
-                )
-                ->build()
         );
     }
 
-    private function collectParameters() : \Closure
+    private function configureConverters( ConsumerBuilder $builder) : ConsumerBuilder
     {
-        return function (array $reflectors) {
-            foreach ($reflectors as $reflector) {
-                $this->components->addParameter($reflector, $this->reader);
+        return $builder->setOutput(
+            function (array $reflectors) {
+                foreach ($reflectors as $reflector) {
+                    $this->components->addConverter($reflector, $this->reader);
+                }
             }
-        };
+        );
     }
 
-    public function parameters(Query $query) : ComponentsScanner
+    private function configureParameters( ConsumerBuilder $builder) : ConsumerBuilder
     {
-        $this->consumers[__FUNCTION__] = Consumers::buildWithDefaultDataModel()
-            ->setQuery($query)
-            ->setOutputNotEmpty($this->collectParameters())
-            ->build()
-        ;
-
-        return $this;
-    }
-
-    public function parametersDefault(): ComponentsScanner
-    {
-        return $this->parameters(
-                Criteria::factory(\ReflectionMethod::class, 'c')
-                    ->andWhere(
-                        Consumers::expr()->hasAnnotations('c', Parameter::class)
-                    )
-                    ->build()
-            )
-        ;
+        return $builder->setOutput(
+            function (array $reflectors) {
+                foreach ($reflectors as $reflector) {
+                    $this->components->addParameter($reflector, $this->reader);
+                }
+            }
+        );
     }
 
     private function collectKeys() : \Closure
@@ -218,6 +107,10 @@ class ComponentsScanner
         };
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     private function keys() : array
     {
         $consumers = [];
@@ -230,40 +123,61 @@ class ComponentsScanner
                     ->build()
             )
             ->setOutputNotEmpty($this->collectKeys())
-            ->build()
         ;
 
         return $consumers;
     }
 
-    public function scanWithConfig(ScanConfig $config)
-    {
-        $components = Annotations\BindingsBuilders::instance();
-        $this->components = $components;
-
-        $consumers = [];
-        $consumer = $config->providersConsumer(Consumers::buildWithDefaultDataModel());
-        if ($consumer) {
-            $consumers[] = $consumer->setOutput($this->collectProviders());
-        }
-    }
-
     /**
-     * @param array | string[] $sources
+     * @param ScanConfig $config
      * @return Components\Components
+     * @throws \Exception
      */
-    public function scan(array $sources) : Components\Components
+    public function scanWithConfig( ScanConfig $config) : Components\Components
     {
         $components = Annotations\BindingsBuilders::instance();
-        $this->components = $components;
+        $this->components = &$components;
 
-        $consumers = array_merge($this->consumers, $this->keys());
-        $consumer = new ClassFileConsumer($consumers);
-        Streams::classFiles($sources)->consume($consumer);
+        $consumerBuilders = array_merge([
+            $config->providersConsumer(
+                $this->configureProviders(Consumers::buildWithDefaultDataModel())
+            ),
+            $config->controllersConsumer(
+                $this->configureControllers(Consumers::buildWithDefaultDataModel())
+            ),
+            $config->factoriesConsumer(
+                $this->configureFactories(Consumers::buildWithDefaultDataModel())
+            ),
+            $config->convertersConsumer(
+                $this->configureConverters(Consumers::buildWithDefaultDataModel())
+            ),
+            $config->parametersConsumer(
+                $this->configureParameters(Consumers::buildWithDefaultDataModel())
+            ),
+        ], $this->keys());
+        $consumerBuilders = array_filter($consumerBuilders, function ($x) {
+            return !!$x;
+        });
+        $consumers = array_map(function (ConsumerBuilder $builder) {
+            return $builder->build();
+        }, $consumerBuilders);
+
+        Streams::classFiles($config->getFolders())->consume(new ClassFileConsumer($consumers));
 
         $result = $components->build();
         $this->components = null;
 
         return $result;
+    }
+
+    /**
+     * @param array | string[] $sources
+     * @return Components\Components
+     * @throws \Exception
+     */
+    public function scan(array $sources) : Components\Components
+    {
+        $config = ScanConfigDefault::instance($sources);
+        return $this->scanWithConfig($config);
     }
 }

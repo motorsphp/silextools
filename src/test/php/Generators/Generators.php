@@ -1,7 +1,7 @@
 <?php namespace Motorphp\SilexTools\Generators;
 
 use Motorphp\SilexTools\Bootstrap\Signatures;
-use Motorphp\SilexTools\NetteLibrary\BootstrapBuilderAdapter;
+use Motorphp\SilexTools\NetteLibrary\BootstrapWritter;
 use Motorphp\SilexTools\ParametersFile\ParametersFileWriter;
 use PHPUnit\Framework\TestCase;
 use Resource\Bootstrap\BootstrapInterface;
@@ -37,7 +37,7 @@ class GeneratorsTest extends TestCase
         $components = [];
         $signatures = new Signatures();
 
-        $builder = new BootstrapBuilderAdapter();
+        $builder = new BootstrapWritter();
         $builder
             ->withClassname($class)
             ->withSameNamespaceAsClass($class)

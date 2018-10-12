@@ -1,8 +1,5 @@
 <?php namespace Motorphp\SilexTools\NetteLibrary;
 
-use Motorphp\SilexAnnotations\Reader\ConstantsReader;
-use Motorphp\SilexTools\Annotations\ComponentsScanner;
-use Motorphp\SilexTools\Bootstrap\BootstrapBuilder;
 use Motorphp\SilexTools\Components\Components;
 use Motorphp\SilexTools\Components\ComponentsVisitorGroup;
 use Motorphp\SilexTools\NetteLibrary\Method\BodyWriter;
@@ -12,7 +9,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Factory;
 use Nette\PhpGenerator\PhpNamespace;
 
-class BootstrapBuilderAdapter implements BootstrapBuilder
+class BootstrapWritter
 {
     /** @var string */
     private $name;
@@ -20,7 +17,7 @@ class BootstrapBuilderAdapter implements BootstrapBuilder
     /** @var string */
     private $namespace;
 
-    /** @var $array|Configuration[] */
+    /** @var $array| Configuration[] */
     private $methods = [];
 
     /** @var $array|string[] */
@@ -32,62 +29,32 @@ class BootstrapBuilderAdapter implements BootstrapBuilder
     /** @var array|string[] */
     private $folders;
 
-    /**
-     * @param string $class
-     * @return BootstrapBuilder
-     * @throws \ReflectionException
-     */
-    public function withSameNamespaceAsClass(string $class) : BootstrapBuilder
-    {
-        $reflection = new \ReflectionClass($class);
-        $this->namespace = $reflection->getNamespaceName();
-        return $this;
-    }
-
-    public function withNamespace(string $namespace) : BootstrapBuilder
+    public function withNamespace(string $namespace) : BootstrapWritter
     {
         $this->namespace = $namespace;
         return $this;
     }
 
     /**
-     * @param string $class
-     * @return BootstrapBuilder
+     * @param \string $class
+     * @return BootstrapWritter
      * @throws \ReflectionException
      */
-    public function withClassname(string $class) : BootstrapBuilder
+    public function withClassname(string $class) : BootstrapWritter
     {
         $reflection = new \ReflectionClass($class);
         $this->name = $reflection->getShortName();
         return $this;
     }
 
-    public function withComponents(Components $components) : BootstrapBuilder
+    public function withComponents(Components $components) : BootstrapWritter
     {
         $this->components = $components;
         $this->folders = null;
         return $this;
     }
 
-    /**
-     * @param string|string[] $folders
-     * @return BootstrapBuilder
-     */
-    public function withComponentsFrom($folders): BootstrapBuilder
-    {
-        if (is_string($folders)) {
-            $this->folders = [ $folders ];
-        } else if (is_array($folders)){
-            $this->folders = $folders;
-        } else {
-            throw new \InvalidArgumentException('expecting either a path to a folder or a list of folders');
-        }
-
-        $this->components = null;
-        return $this;
-    }
-
-    public function withMethod(BodyWriter $writer, \ReflectionMethod $signature)  : BootstrapBuilder
+    public function withMethod(BodyWriter $writer, \ReflectionMethod $signature)  : BootstrapWritter
     {
         $configuration = new Configuration();
         $configuration->setWriter($writer);
@@ -97,13 +64,13 @@ class BootstrapBuilderAdapter implements BootstrapBuilder
         return $this;
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function build() : string
     {
-        if (! empty($this->folders)) {
-            $components =  ComponentsScanner::createDefault(ConstantsReader::instance())->scan($this->folders);
-        } else {
-            $components = &$this->components;
-        }
+        $components = &$this->components;
 
         $writers = array_map(function (Configuration $configuration) {
             return $configuration->getWriter();

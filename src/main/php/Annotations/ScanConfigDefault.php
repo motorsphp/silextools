@@ -7,6 +7,10 @@ use Motorphp\SilexAnnotations\Common\ParamConverter;
 use Motorphp\SilexAnnotations\Common\Parameter;
 use Motorphp\SilexAnnotations\Common\ServiceFactory;
 use Pimple\ServiceProviderInterface;
+use Swagger\Annotations\Delete;
+use Swagger\Annotations\Get;
+use Swagger\Annotations\Post;
+use Swagger\Annotations\Put;
 
 class ScanConfigDefault implements ScanConfig
 {
@@ -34,7 +38,6 @@ class ScanConfigDefault implements ScanConfig
         return $config;
     }
 
-
     public function __construct(array $folders)
     {
         $this->folders = $folders;
@@ -46,7 +49,12 @@ class ScanConfigDefault implements ScanConfig
         return $this;
     }
 
-    public function providersConsumer(ConsumerBuilder $builder) : ?ConsumerBuilder
+    /**
+     * @param ConsumerBuilder $builder
+     * @return ConsumerBuilder|null
+     * @throws \Exception
+     */
+    public function providersConsumer( ConsumerBuilder $builder) : ?ConsumerBuilder
     {
         if ($this->providers) {
             $query = Criteria::factory(\ReflectionClass::class, 'c')
@@ -68,7 +76,12 @@ class ScanConfigDefault implements ScanConfig
         return $this;
     }
 
-    public function controllersConsumer(ConsumerBuilder $builder) : ?ConsumerBuilder
+    /**
+     * @param ConsumerBuilder $builder
+     * @return ConsumerBuilder|null
+     * @throws \Exception
+     */
+    public function controllersConsumer( ConsumerBuilder $builder) : ?ConsumerBuilder
     {
         if ($this->controllers) {
             $query = Criteria::factory(\ReflectionMethod::class, 'c')
@@ -88,7 +101,12 @@ class ScanConfigDefault implements ScanConfig
         return $this;
     }
 
-    public function factoriesConsumer(ConsumerBuilder $builder) : ?ConsumerBuilder
+    /**
+     * @param ConsumerBuilder $builder
+     * @return ConsumerBuilder|null
+     * @throws \Exception
+     */
+    public function factoriesConsumer( ConsumerBuilder $builder) : ?ConsumerBuilder
     {
         if ($this->factories) {
             $query = Criteria::factory(\ReflectionMethod::class, 'c')
@@ -108,7 +126,12 @@ class ScanConfigDefault implements ScanConfig
         return $this;
     }
 
-    public function convertersConsumer(ConsumerBuilder $builder) : ?ConsumerBuilder
+    /**
+     * @param ConsumerBuilder $builder
+     * @return ConsumerBuilder|null
+     * @throws \Exception
+     */
+    public function convertersConsumer( ConsumerBuilder $builder) : ?ConsumerBuilder
     {
         if ($this->converters) {
             $query = Criteria::factory(\ReflectionMethod::class, 'c')
@@ -129,7 +152,12 @@ class ScanConfigDefault implements ScanConfig
         return $this;
     }
 
-    public function parametersConsumer(ConsumerBuilder $builder) : ?ConsumerBuilder
+    /**
+     * @param ConsumerBuilder $builder
+     * @return ConsumerBuilder|null
+     * @throws \Exception
+     */
+    public function parametersConsumer( ConsumerBuilder $builder) : ?ConsumerBuilder
     {
         if ($this->parameters) {
             $query =  Criteria::factory(\ReflectionMethod::class, 'c')
